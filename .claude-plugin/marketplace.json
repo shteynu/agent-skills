@@ -1,0 +1,15 @@
+{
+  "name": "shteynu",
+  "description": "shteynu's plugins for AI coding agents",
+  "owner": {
+    "name": "shteynu",
+    "url": "https://github.com/shteynu"
+  },
+  "plugins": [
+    {
+      "name": "agent-skills",
+      "source": "./",
+      "description": "task-tracker and verification skills: session continuity, handoffs and proportional verification evidence."
+    }
+  ]
+}

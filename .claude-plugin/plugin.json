@@ -1,0 +1,12 @@
+{
+  "name": "agent-skills",
+  "displayName": "Agent Skills",
+  "description": "Work continuity and verification discipline for AI coding agents: branch-scoped task files, session start and handoff, and proportional, evidence-recorded verification.",
+  "author": {
+    "name": "shteynu",
+    "url": "https://github.com/shteynu"
+  },
+  "repository": "https://github.com/shteynu/agent-skills",
+  "keywords": ["workflow", "handoff", "task-tracking", "verification"],
+  "skills": ["./task-tracker", "./verification"]
+}

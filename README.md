@@ -29,11 +29,42 @@ Keeps the skills updatable and pins an exact commit:
 git submodule add https://github.com/shteynu/agent-skills .agents/skills/shared
 ```
 
-### Option B — copy
+### Option B — Claude Code plugin
+
+This repository is also a Claude Code plugin marketplace (`shteynu`) that
+lists one plugin, `agent-skills`, carrying both skills. Nothing is copied
+into the project, and a project that does not need the skills does not load
+them.
+
+```bash
+claude plugin marketplace add shteynu/agent-skills
+claude plugin install agent-skills@shteynu
+```
+
+Inside a session, the same is `/plugin marketplace add shteynu/agent-skills`
+followed by `/plugin install agent-skills@shteynu`. Install into a single
+project with `--scope project`, which records the plugin in that project's
+`.claude/settings.json` so everyone who trusts the folder gets it.
+
+The skills then appear as `agent-skills:task-tracker` and
+`agent-skills:verification`. Wire the routing below with those names instead
+of file paths.
+
+- **Updates.** `plugin.json` carries no `version` on purpose, so an install
+  tracks this repository's commits. Pull them with
+  `claude plugin update agent-skills@shteynu`, or turn on auto-update for the
+  marketplace under **Marketplaces** in `/plugin`.
+- **Private repository.** Claude Code clones with the machine's own git
+  credentials and never prompts: a GitHub SSH key loaded in `ssh-agent`, or
+  `gh auth login` followed by `gh auth setup-git` for HTTPS.
+- **Claude Code only.** Codex, Gemini CLI and other clients do not read
+  Claude Code plugins; give them Option A or C.
+
+### Option C — copy
 
 Copy a skill directory into the project's skills directory. A copy is a fork
 that drifts silently, so record the source repository and commit next to the
-copy, and prefer Option A when the project tolerates submodules.
+copy, and prefer Option A or B when the project tolerates them.
 
 ### Wire the routing
 
@@ -46,6 +77,9 @@ client needs it), for example:
 - Verifying changes, proving a fix, checking merge readiness, or recording
   verification evidence → `.agents/skills/shared/verification/SKILL.md`.
 ```
+
+With the plugin (Option B), name the skills instead of the paths:
+`agent-skills:task-tracker` and `agent-skills:verification`.
 
 ### Declare the project profile
 
