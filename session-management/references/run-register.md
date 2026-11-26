@@ -8,6 +8,11 @@ block below into the path the binding names, or into
 ```markdown
 # Run <run-id>
 
+## Plan
+
+<The plan from development-factory's run-plan format, when the project uses
+it; otherwise the goal and the lines' order in a few lines.>
+
 ## Run
 
 - Started: <YYYY-MM-DD>

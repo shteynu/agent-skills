@@ -1,0 +1,495 @@
+[
+ {
+  "id": "df-001",
+  "small": true,
+  "consent_multi_agent": "yes",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "The intake sends it straight back: fix the README heading in this session, with no plan, no files and no mention of the factory."
+ },
+ {
+  "id": "df-002",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "signup form folder",
+      "signup API endpoint folder"
+     ],
+     "needs": []
+    }
+   ],
+   "topology": {
+    "kind": "this-session",
+    "rejected": {}
+   }
+  },
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Record a one-line plan in the task file (no run register), with this-session as the topology: the six files import each other and fit one context. Then do the work here, with the independent review as a subagent inside the line."
+ },
+ {
+  "id": "df-003",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "config key definition",
+      "the 40 files that use the key"
+     ],
+     "needs": []
+    }
+   ],
+   "topology": {
+    "kind": "subagents",
+    "rejected": {
+     "this-session": "the search across 40 files for the old name is a costly piece that returns its result inside one step, so it goes to a subagent"
+    }
+   }
+  },
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Record a one-line plan in the task file with subagents as the topology. Send the search for uses of the old name to a subagent and do the rename in this session."
+ },
+ {
+  "id": "df-004",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "services/reports/"
+     ],
+     "needs": []
+    },
+    {
+     "id": "L2",
+     "touches": [
+      "ui/theme/"
+     ],
+     "needs": []
+    }
+   ],
+   "topology": {
+    "kind": "parallel-sessions",
+    "rejected": {
+     "this-session": "two lines, each with its own branch and done-when",
+     "subagents": "two separate lines, not pieces of one step"
+    }
+   }
+  },
+  "sessions_opened": 2,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Record the plan as the first section of the run register and hand it to session-management. It opens two worker sessions (writers_at_once 2), each on its own branch and worktree with its own brief, and integration is planned as a later line."
+ },
+ {
+  "id": "df-005",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "services/reports/",
+      "ui/router.ts"
+     ],
+     "needs": []
+    },
+    {
+     "id": "L2",
+     "touches": [
+      "ui/theme/",
+      "ui/router.ts"
+     ],
+     "needs": [
+      "L1"
+     ]
+    }
+   ],
+   "topology": {
+    "kind": "phase-chain",
+    "rejected": {
+     "this-session": "two lines, each with its own branch and done-when",
+     "subagents": "two separate lines, not pieces of one step",
+     "parallel-sessions": "both lines add a route to ui/router.ts, so they depend on each other and must run one after the other"
+    }
+   }
+  },
+  "sessions_opened": 1,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Record a phase-chain plan in the run register: CSV export first, then dark mode on top of it, because both edit ui/router.ts. Open one worker session for L1; L2 waits as idle until L1 ends."
+ },
+ {
+  "id": "df-006",
+  "small": false,
+  "consent_multi_agent": "no",
+  "plan": {
+   "consent_multi_agent": "no",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "services/reports/"
+     ],
+     "needs": []
+    },
+    {
+     "id": "L2",
+     "touches": [
+      "ui/theme/"
+     ],
+     "needs": []
+    }
+   ],
+   "topology": {
+    "kind": "parallel-sessions",
+    "rejected": {
+     "this-session": "two lines, each with its own branch and done-when",
+     "subagents": "two separate lines, not pieces of one step"
+    }
+   }
+  },
+  "sessions_opened": 0,
+  "asks_owner": true,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": "These two features (CSV export in services/reports/ and dark mode in ui/theme/) share no files and could run in two parallel sessions. The project's instructions require your consent for multi-agent work, and the decision log has none. Do you consent? Until you answer, I am doing them one after the other in this session.",
+  "actions_now": "Record parallel-sessions as the topology I would choose, with the reason, and note that consent is missing. Run the lines one after the other in this session (or as a chain the owner starts) and ask the owner once for consent."
+ },
+ {
+  "id": "df-007",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "billing schema"
+     ],
+     "needs": []
+    },
+    {
+     "id": "L2",
+     "touches": [
+      "billing service"
+     ],
+     "needs": [
+      "L1"
+     ]
+    },
+    {
+     "id": "L3",
+     "touches": [
+      "billing API"
+     ],
+     "needs": [
+      "L2"
+     ]
+    },
+    {
+     "id": "L4",
+     "touches": [
+      "billing UI"
+     ],
+     "needs": [
+      "L3"
+     ]
+    }
+   ],
+   "topology": {
+    "kind": "phase-chain",
+    "rejected": {
+     "this-session": "four lines, and the whole is far beyond one context",
+     "subagents": "several lines, not pieces of one step, and too large for one context",
+     "parallel-sessions": "each line needs the result of the one before"
+    }
+   }
+  },
+  "sessions_opened": 1,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Record a four-phase chain (schema, service, API, UI) in the run register and hand it to session-management. It opens the schema phase session now; each later phase opens when the one before it ends."
+ },
+ {
+  "id": "df-008",
+  "small": false,
+  "consent_multi_agent": "unknown",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [
+   {
+    "gap": "G1",
+    "action": "extend",
+    "layer": "domain",
+    "as_own_line": true
+   }
+  ],
+  "gaps": [
+   {
+    "id": "G1",
+    "state": "open"
+   }
+  ],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "G1 has reached the count and api-conventions already owns handlers, so mark G1 open and write a proposal to extend api-conventions with the error-handling rule, with the two review files as evidence. Add the extension as its own line, with branch, worker and evals, for session-management to staff; the layer's owner accepts it."
+ },
+ {
+  "id": "df-009",
+  "small": false,
+  "consent_multi_agent": "unknown",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [
+   {
+    "gap": "G1",
+    "action": "none",
+    "layer": null,
+    "as_own_line": false
+   }
+  ],
+  "gaps": [
+   {
+    "id": "G1",
+    "state": "watching"
+   }
+  ],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Log the gap ('no skill covers line: database migrations', count 1, with this line as evidence) as watching and take no other action on it. Put the gap in the line's brief so the worker records what it learns."
+ },
+ {
+  "id": "df-010",
+  "small": false,
+  "consent_multi_agent": "unknown",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [
+   {
+    "gap": "G3",
+    "action": "new",
+    "layer": "domain",
+    "as_own_line": true
+   }
+  ],
+  "gaps": [
+   {
+    "id": "G3",
+    "state": "open"
+   }
+  ],
+  "new_skill_started": true,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "G3 has reached the count and no skill owns migrations, so open it and write a proposal for a new project-layer migrations skill (only one new skill at a time). It gets its own line, branch, worker and eval set from the template, is used provisionally as a draft as the binding allows, and the layer's owner accepts it."
+ },
+ {
+  "id": "df-011",
+  "small": false,
+  "consent_multi_agent": "unknown",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [
+   {
+    "gap": "G1",
+    "action": "propose-shared",
+    "layer": "engineering",
+    "as_own_line": false
+   }
+  ],
+  "gaps": [
+   {
+    "id": "G1",
+    "state": "open"
+   }
+  ],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "Log 'repeated brief text' (count 3, with the three briefs as evidence) as open. Because the rule applies to any repository, draft it as an extension of the owning engineering skill (task-tracker or verification) and propose it to the collection's repository as a pull request, without touching the project's pinned copy; the project uses it only once it is accepted and pinned."
+ },
+ {
+  "id": "df-012",
+  "small": false,
+  "consent_multi_agent": "unknown",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": true,
+  "skill_actions": [
+   {
+    "gap": "G1",
+    "action": "ask-owner",
+    "layer": null,
+    "as_own_line": false
+   }
+  ],
+  "gaps": [
+   {
+    "id": "G1",
+    "state": "open"
+   }
+  ],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": "A worker was refused force-push twice by your permission rule (exact commands and messages are in its task file); the line is blocked. A skill cannot grant force-push: whether to allow it for rebased branches is your decision, by changing that rule in your settings. Otherwise the line can integrate by merging instead of rebasing. Which do you want?",
+  "actions_now": "Log the repeated block with its evidence and do not write or change any skill that would allow force-push. Keep the line blocked without retrying or rerouting the action, tell the owner the cause and the exact settings change, and continue with independent work."
+ },
+ {
+  "id": "df-013",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "src/types/order.ts",
+      "L1 area"
+     ],
+     "needs": []
+    },
+    {
+     "id": "L2",
+     "touches": [
+      "L2 area",
+      "imports src/types/order.ts"
+     ],
+     "needs": [
+      "L1"
+     ]
+    }
+   ],
+   "topology": {
+    "kind": "phase-chain",
+    "rejected": {
+     "parallel-sessions": "L1 changed src/types/order.ts, which L2 imports, so the lines are no longer independent"
+    }
+   }
+  },
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": {
+   "recorded": true,
+   "reason": "L1 changed the shared type src/types/order.ts that L2 imports, which breaks the assumption of no common files; L2 now needs L1's result"
+  },
+  "owner_message": null,
+  "actions_now": "Check L1's report against its branch, then record the change from parallel-sessions to phase-chain in the plan's Changes, with the evidence. Stop sending L2 new steps (it waits idle) until L1 is verified and merged, then continue L2 on top of L1's change."
+ },
+ {
+  "id": "df-014",
+  "small": true,
+  "consent_multi_agent": "unknown",
+  "plan": null,
+  "sessions_opened": 0,
+  "asks_owner": false,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": null,
+  "actions_now": "The intake sends it straight back as a read-only question: read the auth middleware and explain it in this session, with no plan and no files."
+ },
+ {
+  "id": "df-015",
+  "small": false,
+  "consent_multi_agent": "yes",
+  "plan": {
+   "consent_multi_agent": "yes",
+   "lines": [
+    {
+     "id": "L1",
+     "touches": [
+      "pricing page",
+      "navigation",
+      "analytics events"
+     ],
+     "needs": []
+    }
+   ],
+   "topology": {
+    "kind": "this-session",
+    "rejected": {}
+   }
+  },
+  "sessions_opened": 0,
+  "asks_owner": true,
+  "skill_actions": [],
+  "gaps": [],
+  "new_skill_started": false,
+  "edits_shared_copy": false,
+  "topology_change": null,
+  "owner_message": "For the new pricing page: should the pricing model be flat or per-seat? The repository does not say, and the done-when depends on it. Meanwhile I am building the layout, the navigation entry and the analytics events, which do not depend on the choice.",
+  "actions_now": "Record the plan in the task file, with the pricing-model choice as a human decision and the model-dependent part waiting on the owner. Ask the owner once and build the model-independent parts in this session; no model is picked by an agent unless the binding allows a provisional one."
+ }
+]

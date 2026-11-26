@@ -118,6 +118,9 @@ shown.
 
 ## When to open a session
 
+Where the project uses
+[development-factory](../development-factory/SKILL.md), the topology of a
+task is chosen there, at intake; the rules below then apply during the run.
 A new session is for a line of work of its own. Open one when:
 
 - **A phase or deliverable ends.** The next one starts on its own branch
