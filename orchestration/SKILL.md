@@ -57,7 +57,9 @@ continues; nothing is re-run that has a recorded result for the same key.
 
 ## Autonomous runs
 
-When a coordinating session drives the work across hours or days:
+When a coordinating session drives the work across hours or days (how it
+opens, briefs, checks and replaces worker sessions is in
+[session-management](../session-management/SKILL.md)):
 
 - **State lives in Git; the session is replaceable.** After each completed
   step, the result is committed and pushed before the next step starts. A new
