@@ -31,7 +31,30 @@ lines:
     touches: [<files or areas>]
     needs: []                # line ids whose results it needs
     human_decisions: []
-    skills: [<skill>, <skill>]
+    kind: feature            # role-change | cross-boundary | feature | bug-unknown | bug-known | refactor
+    roles:                   # in order; SKILL.md `Roles`
+      - role: product        # product | architect | implementer | reviewer | qa | evals
+        skill: product-spec  # or the project skill the binding names
+        runs_in: line-session    # this-session | line-session | own-session | subagent
+        context: fresh           # fresh | the line's (only for product, architect, implementer)
+        after: []                # roles it waits for; a human gate is named as gate:<what>
+      - role: implementer
+        skill: implementation
+        runs_in: line-session
+        context: the line's
+        after: [product, "gate:spec approved"]
+      - role: reviewer
+        skill: code-review
+        runs_in: subagent
+        context: fresh
+        after: [implementer]
+      - role: qa
+        skill: qa-testing
+        runs_in: own-session     # parallel with the implementer once the spec is approved
+        context: fresh
+        after: ["gate:spec approved"]
+    skipped_roles: {}        # {product: "approved spec docs/specs/x.md exists"}
+    skills: [<other skill>]
     gaps: []                 # gap ids from the gap log
 topology:
   kind: parallel-sessions    # what actually runs: this-session | subagents | parallel-sessions | phase-chain

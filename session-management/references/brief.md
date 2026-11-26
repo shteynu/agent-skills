@@ -12,6 +12,14 @@ Start here
   <path>. They come before this brief. If they disagree with it, stop and
   report the disagreement.
 
+Role
+- You are the <product | architect | implementer | reviewer | QA | evals>
+  of this line. Read <role skill> before anything else in this list.
+- You receive: <spec path, record path, branch or diff>. You hand over:
+  <the file you write, and to which role>.
+- You do not: <the other roles' work, e.g. "review or test your own change",
+  "write tests from the code instead of the spec">.
+
 Task
 - Branch: <branch>. Worktree: <path, or "the shared checkout">.
 - Area: <files or directories>.

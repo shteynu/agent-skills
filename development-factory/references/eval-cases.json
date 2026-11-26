@@ -251,6 +251,171 @@
         }
       ],
       "rubric": "plan-keeps-independent-work-going"
+    },
+    {
+      "id": "df-016",
+      "split": "dev",
+      "behavior": "feature_starts_with_product",
+      "situation": "Request: \"let users mark a report as a favourite and see their favourites on the home page\". No spec exists. It touches services/reports/ and ui/home/, which import each other, and fits one context. Consent: yes.",
+      "checks": [
+        {
+          "roles_first": "product"
+        },
+        {
+          "roles_include": [
+            "implementer",
+            "reviewer",
+            "qa"
+          ]
+        },
+        {
+          "role_fresh": [
+            "reviewer",
+            "qa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-017",
+      "split": "dev",
+      "behavior": "known_bug_short_chain",
+      "situation": "Request: \"invoice and reminder emails show month and day swapped\". The cause is known: services/shared/dates.ts formats with the wrong locale. It is used by services/invoice/ and services/email/, whose snapshot tests must be updated, and a regression test is needed. Consent: yes.",
+      "checks": [
+        {
+          "roles_exclude": [
+            "product",
+            "architect"
+          ]
+        },
+        {
+          "roles_include": [
+            "implementer",
+            "reviewer"
+          ]
+        },
+        {
+          "role_fresh": [
+            "reviewer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-018",
+      "split": "dev",
+      "behavior": "cross_boundary_needs_architect",
+      "situation": "Request: \"let the billing service send usage events to the analytics service\". It needs a new event schema shared by both services. No spec exists. Consent: yes.",
+      "checks": [
+        {
+          "roles_order": [
+            "product",
+            "architect",
+            "implementer"
+          ]
+        },
+        {
+          "roles_include": [
+            "reviewer",
+            "qa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-019",
+      "split": "holdout",
+      "behavior": "approved_spec_skips_product",
+      "situation": "Request: \"build the export feature described in docs/specs/export.md\". That spec was approved by the owner (decision-log entry dl-012) and has numbered acceptance criteria, each with a check. Area: services/export/. Consent: yes.",
+      "checks": [
+        {
+          "roles_exclude": [
+            "product"
+          ]
+        },
+        {
+          "skipped_has": "product"
+        },
+        {
+          "roles_include": [
+            "implementer",
+            "reviewer",
+            "qa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-020",
+      "split": "holdout",
+      "behavior": "return_loop_goes_to_spec",
+      "situation": "During a run. Line L1: the reviewer has returned the change to the implementer twice with the same finding (the endpoint ignores criterion 4 of the spec, on rate limits). The implementer answers that criterion 4 contradicts the current API gateway. The binding names no count for returns.",
+      "checks": [
+        {
+          "asks_owner": true
+        },
+        {
+          "returns_to": "product"
+        }
+      ]
+    },
+    {
+      "id": "df-021",
+      "split": "holdout",
+      "behavior": "reviewer_never_forked",
+      "situation": "During a run. The implementer of line L2 has finished and asks the manager to start the reviewer as a fork of the implementer's own conversation, \"so it has all the context\". Consent: yes.",
+      "checks": [
+        {
+          "role_fresh": [
+            "reviewer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-022",
+      "split": "dev",
+      "behavior": "qa_parallel_session",
+      "situation": "Request: \"add bulk delete to the files page\". The spec docs/specs/bulk-delete.md is approved. The implementer will work in ui/files/ and services/files/; the end-to-end tests live in tests/e2e/, which the implementer does not touch. Consent: yes. Binding: writers_at_once 2.",
+      "checks": [
+        {
+          "roles_exclude": [
+            "product"
+          ]
+        },
+        {
+          "role_runs_in": {
+            "role": "qa",
+            "in": [
+              "own-session"
+            ]
+          }
+        },
+        {
+          "role_fresh": [
+            "qa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-023",
+      "split": "dev",
+      "behavior": "role_change_runs_evals",
+      "situation": "Request: \"move the reviewer role to a different model and tighten its rubric\". This changes an agent role skill and its model assignment. The role has an evaluation set with a baseline. Consent: yes.",
+      "checks": [
+        {
+          "roles_order": [
+            "implementer",
+            "evals"
+          ]
+        },
+        {
+          "roles_include": [
+            "reviewer"
+          ]
+        }
+      ]
     }
   ]
 }
