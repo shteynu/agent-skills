@@ -216,3 +216,7 @@ cycle, that every section is in the reading map, that relative links resolve
 and no reference is orphaned, that `U` and `E` skills carry no domain
 vocabulary, and that `.claude-plugin/plugin.json` lists exactly the skill
 directories. CI runs the same command.
+
+## License
+
+[MIT](LICENSE).
