@@ -1,12 +1,34 @@
 {
   "name": "agent-skills",
   "displayName": "Agent Skills",
-  "description": "Work continuity and verification discipline for AI coding agents: branch-scoped task files, session start and handoff, and proportional, evidence-recorded verification.",
+  "description": "A universal skill tree for AI agents and agent pipelines: role and file discipline, human decision gates, verifiable citations, sources, third-party rights, multilingual equivalence, simulated users, personal data, versioning, and the engineering layer (verification, architecture records, implementation, review, QA, evals, orchestration, task handoff, gates, retrieval contract).",
   "author": {
     "name": "shteynu",
     "url": "https://github.com/shteynu"
   },
   "repository": "https://github.com/shteynu/agent-skills",
-  "keywords": ["workflow", "handoff", "task-tracking", "verification"],
-  "skills": ["./task-tracker", "./verification"]
+  "keywords": ["workflow", "handoff", "task-tracking", "verification", "multi-agent", "pipeline", "human-in-the-loop", "evals", "rag"],
+  "skills": [
+    "./skill-authoring",
+    "./agent-foundations",
+    "./pipeline-artifacts",
+    "./human-gates",
+    "./evidence-citing",
+    "./source-research",
+    "./third-party-rights",
+    "./multilingual-equivalence",
+    "./persona-simulation",
+    "./personal-data-handling",
+    "./provenance-versioning",
+    "./verification",
+    "./architecture-decisions",
+    "./implementation",
+    "./code-review",
+    "./qa-testing",
+    "./agent-evals",
+    "./orchestration",
+    "./task-tracker",
+    "./gate-management",
+    "./retrieval-corpus"
+  ]
 }
