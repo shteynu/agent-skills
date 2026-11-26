@@ -41,6 +41,7 @@ JSON so that code can grade them.
 | df-024 | dev | each role takes its model and effort from the binding; the reviewer differs from the implementer |
 | df-025 | holdout | a nearly spent budget never lowers the reviewer's model or effort |
 | df-026 | holdout | no models in the binding: roles inherit, and the reviewer is still not a fork |
+| df-027 | holdout | a binding that puts the reviewer below the implementer is followed, recorded and put to the owner |
 
 The holdout cases were written by the same author as the skill, at the
 same time; they guard against tuning to the dev cases, not against the
@@ -99,14 +100,20 @@ model: claude-opus-5-5 (role under test); claude-sonnet-5-5 (rubric grader)
 runs_per_case: 5
 recorded_at: 2026-11-26
 pass_rate: { dev: 1.00, holdout: 1.00 }
-per_case: all 26 cases 1.00
+per_case: all 27 cases 1.00
 rubric: { plan-keeps-independent-work-going: [3, 3, 3, 3, 3], mean: 3.0 }
-runs: eval-runs/2026-11-26-r6/
+runs: eval-runs/2026-11-26-r7/
 ```
 
-Runs: [1](eval-runs/2026-11-26-r6/run-1.json), [2](eval-runs/2026-11-26-r6/run-2.json), [3](eval-runs/2026-11-26-r6/run-3.json), [4](eval-runs/2026-11-26-r6/run-4.json), [5](eval-runs/2026-11-26-r6/run-5.json).
+Runs: [1](eval-runs/2026-11-26-r7/run-1.json), [2](eval-runs/2026-11-26-r7/run-2.json), [3](eval-runs/2026-11-26-r7/run-3.json), [4](eval-runs/2026-11-26-r7/run-4.json), [5](eval-runs/2026-11-26-r7/run-5.json).
 
 **Earlier rounds.**
+- **Round 6** passed all 26 cases after round 5's fixes (rubric 3.0). An
+  independent review then found that the skill recorded `inherited` where a
+  client gives a worker its own default model, that a session cannot run
+  above the manager's level, and that nothing said what to do with a
+  binding that breaks the role rules; the skill now covers all three and
+  df-027 tests the last. Runs: [1](eval-runs/2026-11-26-r6/run-1.json), [2](eval-runs/2026-11-26-r6/run-2.json), [3](eval-runs/2026-11-26-r6/run-3.json), [4](eval-runs/2026-11-26-r6/run-4.json), [5](eval-runs/2026-11-26-r6/run-5.json).
 - **Round 5** added the model and effort cases df-024 to df-026, which
   passed in all five runs, and found two defects elsewhere: dev 0.97,
   holdout 0.90. df-013 failed in all five runs although every answer
@@ -140,7 +147,7 @@ Runs: [1](eval-runs/2026-11-26-r6/run-1.json), [2](eval-runs/2026-11-26-r6/run-2
 - The skill and the cases have one author, and the holdout was written with
   the skill. df-020 is a holdout case whose failure led to a change in the
   skill, so it no longer tests generalisation.
-- Each run answered all 26 cases in one context, in a shuffled order, not
+- Each run answered all 27 cases in one context, in a shuffled order, not
   one fresh agent per case.
 - The model and effort cases check what the plan records, not what a
   client runs, and their models are placeholders (model A to D), so they

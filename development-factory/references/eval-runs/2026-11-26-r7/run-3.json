@@ -1,0 +1,981 @@
+[
+  {
+    "id": "df-004",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "CSV export of reports",
+          "touches": ["services/reports/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        },
+        {
+          "id": "L2",
+          "goal": "Dark mode in settings",
+          "touches": ["ui/theme/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "parallel-sessions",
+        "preferred": null,
+        "rejected": {
+          "this-session": "two lines that are independent of each other",
+          "subagents": "each line is a whole feature with its own branch and merge, not a piece returning inside one step"
+        },
+        "limits": {"writers_at_once": 2, "source": "binding writers_at_once"}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 2,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Record the plan in the run register and hand it to session-management, which opens two line sessions on separate branches and worktrees (L1 export, L2 dark mode), within the limit of two writers; each starts with product."
+  },
+  {
+    "id": "df-022",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Bulk delete on the files page per docs/specs/bulk-delete.md",
+          "touches": ["ui/files/", "services/files/", "tests/e2e/ (QA only)"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["gate:spec approved"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "own-session", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]}
+          ],
+          "skipped_roles": {"product": "approved spec docs/specs/bulk-delete.md exists"}
+        }
+      ],
+      "topology": {
+        "kind": "parallel-sessions",
+        "preferred": null,
+        "levels": [{"line": "L1", "kind": "this-session", "note": "implementer here; QA as its own session in parallel, writing tests/e2e/ from the spec on its own branch, integrated with the implementer's"}],
+        "rejected": {
+          "this-session": "QA can run in parallel from the approved spec in files the implementer does not touch, as a session of its own",
+          "subagents": "QA's work spans the implementer's whole run, not a result inside one step"
+        },
+        "limits": {"writers_at_once": 2, "source": "binding writers_at_once"}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 1,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Skip product (approved spec), implement in this session, and open one QA session with a fresh context on its own branch and worktree writing tests/e2e/ from the spec; the reviewer runs as a fresh subagent after the implementer, and the QA branch is integrated with the implementer's as its own step."
+  },
+  {
+    "id": "df-005",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "CSV export of reports, with its route",
+          "touches": ["services/reports/", "ui/router.ts"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        },
+        {
+          "id": "L2",
+          "goal": "Dark mode in settings, with its route",
+          "touches": ["ui/theme/", "ui/router.ts"],
+          "needs": ["L1"],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "phase-chain",
+        "preferred": null,
+        "rejected": {
+          "this-session": "two lines, each with its own branch and merge",
+          "subagents": "two whole features, not pieces of one step",
+          "parallel-sessions": "L1 and L2 both add a route to ui/router.ts, so they are not independent"
+        },
+        "limits": {"writers_at_once": 2, "source": "binding writers_at_once"}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 1,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Record a chain of two phases because both lines edit ui/router.ts: open the L1 session now; L2 opens on its own branch from L1's result when L1 ends."
+  },
+  {
+    "id": "df-009",
+    "small": false,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [{"gap": "G1", "action": "none", "layer": "domain", "as_own_line": false}],
+    "gaps": [{"id": "G1", "signal": "no skill covers line", "area": "database migrations", "count": 1, "state": "watching"}],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Log the gap 'no skill covers line: database migrations' with its evidence (this run's line) as watching, count 1, and write no skill; put the open gap in the line worker's brief so it records what it learns about migrations instead of guessing silently."
+  },
+  {
+    "id": "df-013",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": {
+      "recorded": true,
+      "from": "parallel-sessions",
+      "to": "phase-chain",
+      "reason": "L1 changed src/types/order.ts, which L2 imports (L1's report, checked against L1's commits), so L2 now needs L1's result and the lines share a file; L2 continues after L1 is done, from L1's result"
+    },
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Check L1's claim on its branch, then record the topology change and its reason in the register. L2 sends no further step on the old type and waits as idle until L1 ends, then resumes on a branch updated from L1."
+  },
+  {
+    "id": "df-026",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Tags on notes, shown on each note, per docs/specs/tags.md",
+          "touches": ["services/notes/", "ui/notes/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "approved spec docs/specs/tags.md exists"}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Decline the fork: the reviewer starts as a fresh subagent that reads the diff, the spec and the files, never a copy of the conversation. Work the line in this session, with reviewer then QA as fresh subagents on the manager's model and effort, recorded as inherited."
+  },
+  {
+    "id": "df-008",
+    "small": false,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [{"gap": "G1", "action": "extend", "layer": "domain", "as_own_line": true}],
+    "gaps": [{"id": "G1", "state": "proposed"}],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "G1 reached the count of two, so write a proposal to extend api-conventions with an error-handling rule for API handlers, citing the two review files, rather than a new skill. The change runs as its own line, and the layer's owner accepts it."
+  },
+  {
+    "id": "df-015",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Pricing page layout, navigation entry and analytics events, independent of the pricing model",
+          "touches": ["pricing page", "navigation", "analytics events"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        },
+        {
+          "id": "L2",
+          "goal": "Prices and plan content for the pricing model the owner chooses",
+          "touches": ["pricing page"],
+          "needs": ["L1"],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["gate:owner chooses flat or per-seat pricing"]},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "phase-chain",
+        "preferred": null,
+        "rejected": {
+          "this-session": "two lines, one of them waiting on an owner decision",
+          "subagents": "the lines are whole pieces of work, not results inside one step",
+          "parallel-sessions": "L2 builds on the same page as L1 and waits on the owner's choice"
+        }
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 1,
+    "asks_owner": true,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": "The pricing page needs one decision from you: flat or per-seat pricing? Layout, navigation entry and analytics events go ahead now (L1); the prices and plan content (L2) wait for your answer.",
+    "actions_now": "Ask the owner once which pricing model applies and record it as a human decision; start L1 (the model-independent parts) now, and keep L2 waiting-owner until the answer, with no provisional choice of a model."
+  },
+  {
+    "id": "df-020",
+    "small": false,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": true,
+    "skill_actions": [],
+    "gaps": [{"id": "G1", "signal": "repeated rework", "area": "L1 spec criterion 4 (rate limits) vs the API gateway", "count": 2, "state": "open"}],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": "product",
+    "owner_message": "Line L1 is stopped: the reviewer returned it twice because the endpoint ignores criterion 4 (rate limits), and the implementer reports that criterion 4 contradicts the current API gateway. Product will answer with a new spec version or a question for you: change criterion 4, or change the gateway?",
+    "actions_now": "Stop the reviewer-implementer loop (default limit of two reached), log the gap signal with the two review files as evidence, and send L1 to product, which owns the spec contradiction. Ask the owner; the line waits at product for the answer."
+  },
+  {
+    "id": "df-023",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Reviewer role on a different model with a tightened rubric, no worse than its baseline",
+          "touches": ["reviewer role skill and rubric", "model assignment in the binding"],
+          "needs": [],
+          "kind": "role-change",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "evals", "skill": "agent-evals", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"], "note": "the role under test runs on the reviewer's new model and effort; the rubric's grader runs on another model; results compared with the recorded baseline"},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["evals"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Run a role-change line in this session: implement the rubric and model change, then run the role's evaluation set in a fresh subagent with the role under test on the new model and the grader on another model, then a fresh reviewer subagent. Merging stays the owner's."
+  },
+  {
+    "id": "df-006",
+    "small": false,
+    "consent_multi_agent": "no",
+    "plan": {
+      "consent_multi_agent": "no",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "CSV export of reports",
+          "touches": ["services/reports/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        },
+        {
+          "id": "L2",
+          "goal": "Dark mode in settings",
+          "touches": ["ui/theme/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": "parallel-sessions",
+        "rejected": {
+          "parallel-sessions": "preferred (two independent lines, no shared files), but the project requires the owner's consent to multi-agent work and none is recorded"
+        }
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": true,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": "The two features are independent and could run as two parallel sessions, but this project needs your consent to multi-agent work and none is recorded. I am doing them one after the other in this session; say if you allow parallel sessions.",
+    "actions_now": "Record parallel-sessions as preferred and run both lines one after the other in this session, each on its own branch, and ask the owner once for consent; open no other session."
+  },
+  {
+    "id": "df-024",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "CSV export downloadable from the reports page",
+          "touches": ["services/reports/", "ui/reports/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "this-session", "context": "the line's", "model": "model A", "effort": "high", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "model B", "effort": "high", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "model C", "effort": "high", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "model A", "effort": "high", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "subagents",
+        "preferred": null,
+        "levels": [{"line": "L1", "kind": "subagents", "piece": "read-only search of services/reports/ for every place that formats dates, model D, low"}],
+        "rejected": {
+          "this-session": "the date-format search across services/reports/ is a piece that returns its result inside one step"
+        }
+      },
+      "models": {
+        "source": "binding Models table",
+        "read_only_pieces": {"model": "model D", "effort": "low"},
+        "conflicts": []
+      }
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Start with product (model A, high) writing the spec for approval, run the date-format search as a read-only subagent on model D, low, then implement on model B, high. The reviewer (model C, high) and QA (model A, high) run as fresh subagents afterwards, with each applied value recorded."
+  },
+  {
+    "id": "df-011",
+    "small": false,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [{"gap": "G1", "action": "propose-shared", "layer": "engineering", "as_own_line": true}],
+    "gaps": [{"id": "G1", "signal": "repeated brief text", "area": "commit messages and checks before pushing", "count": 3, "state": "proposed"}],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Log the repeated brief text with the three briefs as evidence. Since the rule applies to any repository, draft it as an extension of the shared skill that owns committing and pushing and propose it to the collection's repository as a pull request, without touching the project's pinned copy. The project uses it only after it is accepted and pinned."
+  },
+  {
+    "id": "df-001",
+    "small": true,
+    "consent_multi_agent": "yes",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Small task: the session fixes the typo itself, with no plan, no files and no mention of the factory."
+  },
+  {
+    "id": "df-017",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Invoice and reminder emails show dates with day and month in the right order",
+          "touches": ["services/shared/dates.ts", "services/invoice/", "services/email/"],
+          "needs": [],
+          "kind": "bug-unknown",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": [], "note": "reproduce with a failing regression test first, then fix the locale and update the snapshot tests"},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "the request states the defect and the expected behaviour; the cause is known"}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "One line in this session: because the fix changes what users see, the chain is a failing regression test first, then the fix in dates.ts and updated snapshots in both services, then a fresh reviewer subagent and a fresh QA subagent."
+  },
+  {
+    "id": "df-007",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Billing schema, with the module's spec and decision record",
+          "touches": ["billing schema"],
+          "needs": [],
+          "kind": "cross-boundary",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "architect", "skill": "architecture-decisions", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["architect", "gate:decision record approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        },
+        {
+          "id": "L2",
+          "goal": "Billing service on the schema",
+          "touches": ["billing service"],
+          "needs": ["L1"],
+          "kind": "feature",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "the approved module spec from L1 covers the service"}
+        },
+        {
+          "id": "L3",
+          "goal": "Billing API",
+          "touches": ["billing API"],
+          "needs": ["L2"],
+          "kind": "cross-boundary",
+          "roles": [
+            {"role": "architect", "skill": "architecture-decisions", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["gate:spec approved"]},
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["architect", "gate:decision record approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "the approved module spec from L1 covers the API"}
+        },
+        {
+          "id": "L4",
+          "goal": "Billing UI",
+          "touches": ["billing UI"],
+          "needs": ["L3"],
+          "kind": "feature",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "line-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "the approved module spec from L1 covers the UI"}
+        }
+      ],
+      "topology": {
+        "kind": "phase-chain",
+        "preferred": null,
+        "rejected": {
+          "this-session": "the whole is far beyond one context",
+          "subagents": "the parts are whole lines with their own branches, not pieces of one step",
+          "parallel-sessions": "each line needs the one before it"
+        }
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 1,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Record a chain of four phases (schema, service, API, UI) in the run register and open the L1 session now; each later phase opens on its own branch when the one before ends."
+  },
+  {
+    "id": "df-021",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [
+      {"line": "L2", "role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited"}
+    ],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Decline the fork: the writer never checks its own work, so the reviewer starts as a fresh subagent that reads L2's diff, spec and record from files, with no copy of the implementer's conversation. Anything the reviewer needs that is not in files goes into L2's task file first."
+  },
+  {
+    "id": "df-003",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Rename the config key everywhere, with no remaining use of the old name",
+          "touches": ["the 40 files that use the key"],
+          "needs": [],
+          "kind": "refactor",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]}
+          ],
+          "skipped_roles": {"product": "the request's check is stated: no use of the old name remains"}
+        }
+      ],
+      "topology": {
+        "kind": "subagents",
+        "preferred": null,
+        "levels": [{"line": "L1", "kind": "subagents", "piece": "read-only search across the repository for every use of the old name"}],
+        "rejected": {
+          "this-session": "the expensive search across many files is a piece that returns its result inside one step"
+        }
+      },
+      "models": {"source": "none: inherited", "read_only_pieces": {"model": "inherited", "effort": "inherited"}, "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "One refactor line in this session: a read-only subagent searches for every use of the old name, this session renames and checks that no use remains, and a fresh reviewer subagent reviews the diff."
+  },
+  {
+    "id": "df-018",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Billing sends usage events to analytics over a new shared event schema",
+          "touches": ["services/billing/", "services/analytics/", "shared event schema"],
+          "needs": [],
+          "kind": "cross-boundary",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "architect", "skill": "architecture-decisions", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["architect", "gate:decision record approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "One cross-boundary line in this session: product writes the spec, then the architect writes a decision record with the event schema draft, each approved before the next role starts. The implementer follows, then a fresh reviewer subagent and a fresh QA subagent."
+  },
+  {
+    "id": "df-010",
+    "small": false,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [{"gap": "G3", "action": "new", "layer": "domain", "as_own_line": true}],
+    "gaps": [{"id": "G3", "state": "proposed"}],
+    "new_skill_started": true,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "G3 reached the count and no skill owns migrations, so write a proposal for a new project domain skill. It is built as its own line, with its own branch and worker, from the skill template, with an evaluation set if it is a role skill, and passes the project's gates. It is used provisionally as a draft until the layer's owner accepts it, and it is the only new skill started at a time."
+  },
+  {
+    "id": "df-016",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Users can mark a report as a favourite and see their favourites on the home page",
+          "touches": ["services/reports/", "ui/home/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "One feature line in this session, because the two folders import each other: product writes the spec for approval, then the implementer, then a fresh reviewer subagent and a fresh QA subagent."
+  },
+  {
+    "id": "df-025",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [
+      {"line": "L1", "role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "model A", "effort": "high"}
+    ],
+    "returns_to": null,
+    "owner_message": "L1's reviewer is running on model A at high effort, as the binding names. 90% of the budget is spent and this review may exceed it; if it does, that is recorded as a budget failure and the run pauses for you. I did not lower the model or effort to fit.",
+    "actions_now": "Start L1's reviewer as a fresh subagent on the binding's model A, high, and never on model C, low to fit the budget. If the budget runs out, record it as a failure and pause the run at its limit."
+  },
+  {
+    "id": "df-014",
+    "small": true,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Small read-only question: the session reads the middleware and explains it, with no plan, no files and no mention of the factory."
+  },
+  {
+    "id": "df-027",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Rate limiting on the public API with 429 responses, per docs/specs/rate-limit.md",
+          "touches": ["services/api/", "services/gateway/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "model A", "effort": "high", "after": ["gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "model B", "effort": "medium", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "model B", "effort": "high", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "approved spec docs/specs/rate-limit.md exists"}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {
+        "source": "binding Models table",
+        "conflicts": ["reviewer at effort medium is below the implementer's high, which breaks 'never at lower effort than the implementer'; followed as the binding names it and put to the owner"]
+      }
+    },
+    "sessions_opened": 0,
+    "asks_owner": true,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": "The binding runs the reviewer at medium effort while the implementer runs at high, which breaks the rule that a reviewer never runs at lower effort than the work it reviews. I am following the binding as written; should the reviewer's effort be raised to high?",
+    "actions_now": "Skip product (approved spec), implement in this session on model A, high, then run the reviewer (model B, medium, as the binding names) and QA (model B, high) as fresh subagents. Record the reviewer-effort conflict in the plan and put it to the owner."
+  },
+  {
+    "id": "df-002",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "Input validation on the signup form and its API endpoint",
+          "touches": ["signup form folder", "signup API endpoint folder"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "product", "skill": "product-spec", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": ["product", "gate:spec approved"]},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "One feature line in this session, because the folders import each other and it fits one context: product states the validation rules as checkable criteria for approval, then the implementer, then a fresh reviewer subagent and a fresh QA subagent."
+  },
+  {
+    "id": "df-019",
+    "small": false,
+    "consent_multi_agent": "yes",
+    "plan": {
+      "consent_multi_agent": "yes",
+      "lines": [
+        {
+          "id": "L1",
+          "goal": "The export feature per docs/specs/export.md",
+          "touches": ["services/export/"],
+          "needs": [],
+          "kind": "feature",
+          "roles": [
+            {"role": "implementer", "skill": "implementation", "runs_in": "this-session", "context": "the line's", "model": "inherited", "effort": "inherited", "after": []},
+            {"role": "reviewer", "skill": "code-review", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["implementer"]},
+            {"role": "qa", "skill": "qa-testing", "runs_in": "subagent", "context": "fresh", "model": "inherited", "effort": "inherited", "after": ["reviewer"]}
+          ],
+          "skipped_roles": {"product": "approved spec docs/specs/export.md exists (dl-012)"}
+        }
+      ],
+      "topology": {
+        "kind": "this-session",
+        "preferred": null,
+        "rejected": {}
+      },
+      "models": {"source": "none: inherited", "conflicts": []}
+    },
+    "sessions_opened": 0,
+    "asks_owner": false,
+    "skill_actions": [],
+    "gaps": [],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": null,
+    "actions_now": "Skip product, since the spec was approved in dl-012. Implement in this session against the numbered criteria, then run a fresh reviewer subagent and a fresh QA subagent that tests from the spec."
+  },
+  {
+    "id": "df-012",
+    "small": false,
+    "consent_multi_agent": "unknown",
+    "plan": null,
+    "sessions_opened": 0,
+    "asks_owner": true,
+    "skill_actions": [{"gap": "G1", "action": "ask-owner", "layer": "universal", "as_own_line": false}],
+    "gaps": [{"id": "G1", "signal": "repeated block", "area": "force-push refused for rebased branches", "count": 2, "state": "open"}],
+    "new_skill_started": false,
+    "edits_shared_copy": false,
+    "topology_change": null,
+    "role_starts": [],
+    "returns_to": null,
+    "owner_message": "A worker was refused force-push twice by your permission rules. A skill cannot grant that, and I will not write one that widens a permission. Do you want to allow force-push for rebased line branches in your settings, or should workers merge instead of rebasing? The line stays blocked until you decide.",
+    "actions_now": "Reject the suggested skill, because it would widen a permission. Keep the line blocked with the exact command and message recorded, log the repeated block, and put the question to the owner without retrying the push in another form."
+  }
+]

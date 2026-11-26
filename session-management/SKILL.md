@@ -165,9 +165,12 @@ Do not open a session:
   model serves it and, where the client has the setting, how much reasoning
   effort. Take both from the binding when opening a worker or a subagent,
   and record them with the line: in the plan's role entry, or in the
-  register's log. Where the binding names none, the worker inherits the
-  manager's model and effort, recorded as `inherited`. Within what the
-  binding allows:
+  register's log. Record what the client actually applies: a client may cap
+  a worker at the manager's own level, or ignore a value it does not offer.
+  Where the binding names none, pass the manager's own model and effort,
+  recorded as `inherited`; a client's own default for a worker (a model
+  fixed on an agent type, a configured default) is not `inherited`, so pass
+  the value or record the default. Within what the binding allows:
   - a read-only or mechanical worker (a search, a lookup, a format
     conversion) may run on a cheaper model or at lower effort;
   - work that judges or feeds other work (a spec, a decision record, a
@@ -176,6 +179,13 @@ Do not open a session:
   - a worker that copies the manager's conversation runs on the manager's
     model and effort where the client cannot change them for a copy, so
     work that needs another model starts fresh.
+
+  Where the binding's values break these rules, or name some kinds of work
+  and not others, take the binding's values, record the conflict and ask
+  the owner. Where the client cannot apply the binding's value, run the
+  work where it can (a subagent instead of a session, or a session the
+  owner starts) or ask the owner; never record a value the client did not
+  apply.
 
   Never lower a worker's model or effort to stay within a budget: an
   exceeded budget is a recorded failure

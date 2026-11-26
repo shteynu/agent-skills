@@ -150,10 +150,13 @@ Take the first row that fits the line:
   ([session-management](../session-management/SKILL.md) `Choosing the
   worker`). The reviewer and QA run on another model than the implementer
   where the binding names one, and never at lower effort than the
-  implementer. In evals, the role under test runs on the model and effort
+  implementer; product and the architect, whose files the implementer
+  builds on, never at lower effort than the implementer either. In evals, the role under test runs on the model and effort
   the changed role will run on; a rubric's grader runs on another model.
-  Where the binding names nothing for a role, it is recorded as
-  `inherited`.
+  Where the binding names nothing for a role, it runs on the manager's own
+  model and effort, recorded as `inherited`. A binding whose values break
+  these rules, or that names some roles and not others, is followed as it
+  is, with the conflict recorded and put to the owner.
 - **Product and architect** run before the implementer in the line's own
   session, or as a session of their own when the spec or the record needs
   research or rounds with the owner.
@@ -180,7 +183,7 @@ before it did not:
 | Topology | Condition |
 | --- | --- |
 | **This session** | One line, it fits one context, and no piece of it is independent enough to hand off. |
-| **This session with subagents** | One line, but it has pieces that return a result inside one step: a search across many files, an evaluation, separate parts of one change that do not share files. The line's own reviewer or QA in a subagent is not such a piece (`Roles are not lines`). |
+| **This session with subagents** | One line, but it has pieces that return a result inside one step: a search across many files, an evaluation of work outside the line, separate parts of one change that do not share files. The line's own reviewer, QA or evals in a subagent is not such a piece (`Roles are not lines`). |
 | **Parallel sessions** | Two or more lines that need no result from each other and touch no common files, and the owner has consented to multi-agent work. |
 | **Chain of phases** | Lines depend on each other in order, or the whole does not fit one context. Each phase is a session on its own branch, opened when the one before ends. |
 
@@ -198,7 +201,7 @@ parallel lines inside one phase. Record each level.
   closing` and `Choosing the worker`.
 - **Roles are not lines.** The roles of one line run inside that line, as
   `Roles` places them; they count toward the topology only when a role runs
-  as a session of its own. A reviewer or QA in a subagent leaves the
+  as a session of its own. A reviewer, QA or evals in a subagent leaves the
   topology as it was: one line with no other piece to hand off is still
   `This session`.
 - **Revisit** the topology when a line's assumption breaks, a new
@@ -318,5 +321,6 @@ itself; those changes are lines of their own or decisions of the owner.
   return loop between roles reaches its limit; a gap can be closed only by
   widening a permission or a gate; the plan needs more sessions or budget
   than the binding allows; the client does not offer the model or effort
-  the binding names for a role. Use the format in
+  the binding names for a role; the binding's models or efforts break the
+  rules of `Where each role runs`. Use the format in
   [agent-foundations](../agent-foundations/SKILL.md) `Escalation`.

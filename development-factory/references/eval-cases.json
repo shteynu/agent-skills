@@ -428,6 +428,14 @@
         },
         {
           "role_model": {
+            "role": "product",
+            "in": [
+              "model A"
+            ]
+          }
+        },
+        {
+          "role_model": {
             "role": "implementer",
             "in": [
               "model B"
@@ -467,6 +475,12 @@
             "reviewer",
             "qa"
           ]
+        },
+        {
+          "role_effort_at_least": {
+            "role": "product",
+            "than": "implementer"
+          }
         }
       ]
     },
@@ -527,6 +541,34 @@
         {
           "role_fresh": [
             "reviewer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-027",
+      "split": "holdout",
+      "behavior": "binding_conflict_followed_and_asked",
+      "situation": "Request: \"add rate limiting to the public API; clients see 429 responses\". An approved spec exists at docs/specs/rate-limit.md. It touches services/api/ and services/gateway/ and fits one context. The binding's Models table, per role (model, effort): implementer: model A, high; reviewer: model B, medium; QA: model B, high. Consent: yes.",
+      "checks": [
+        {
+          "skipped_has": "product"
+        },
+        {
+          "role_effort": {
+            "role": "reviewer",
+            "in": [
+              "medium"
+            ]
+          }
+        },
+        {
+          "asks_owner": true
+        },
+        {
+          "role_fresh": [
+            "reviewer",
+            "qa"
           ]
         }
       ]

@@ -27,6 +27,7 @@ const allRoles = (a) => [...planRoles(a), ...(a.role_starts ?? [])];
 const roleNames = (a) => new Set(allRoles(a).map((r) => r.role));
 const SEPARATE = ['subagent', 'own-session'];
 const norm = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+// Effort levels as the cases name them; a case for another client names its own.
 const EFFORT = ['low', 'medium', 'high', 'xhigh', 'max'];
 const rolesNamed = (a, name) => allRoles(a).filter((r) => r.role === name);
 
@@ -100,13 +101,19 @@ export const CHECKS = {
   },
   roles_differ_model: (a, want) => {
     const [x, y] = want.map((name) => rolesNamed(a, name).map((r) => norm(r.model)));
-    return x.length > 0 && y.length > 0 && x.every((m) => m && m !== 'inherited' && !y.includes(m));
+    const named = (ms) => ms.length > 0 && ms.every((m) => m && m !== 'inherited');
+    return named(x) && named(y) && x.every((m) => !y.includes(m));
   },
+  // Both `inherited` counts as equal; otherwise both must be named levels.
   role_effort_at_least: (a, want) => {
-    const rank = (r) => EFFORT.indexOf(norm(r.effort));
     const found = rolesNamed(a, want.role);
-    const floor = Math.max(-1, ...rolesNamed(a, want.than).map(rank));
-    return found.length > 0 && floor >= 0 && found.every((r) => rank(r) >= floor);
+    const than = rolesNamed(a, want.than);
+    if (found.length === 0 || than.length === 0) return false;
+    const levels = [...found, ...than].map((r) => norm(r.effort));
+    if (levels.every((e) => e === 'inherited')) return true;
+    const rank = (r) => EFFORT.indexOf(norm(r.effort));
+    const floor = Math.max(...than.map(rank));
+    return floor >= 0 && found.every((r) => rank(r) >= floor);
   },
 };
 
