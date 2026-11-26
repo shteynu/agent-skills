@@ -9,7 +9,7 @@
     {
       "name": "agent-skills",
       "source": "./",
-      "description": "task-tracker and verification skills: session continuity, handoffs and proportional verification evidence."
+      "description": "Universal skill tree for AI agents: 11 pipeline skills (roles, files, human gates, citations, sources, rights, languages, personas, personal data, versions) and 10 engineering skills (verification, ADRs, implementation, review, QA, evals, orchestration, task handoff, gates, retrieval contract)."
     }
   ]
 }
