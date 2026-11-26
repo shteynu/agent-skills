@@ -7,6 +7,7 @@
     "url": "https://github.com/shteynu"
   },
   "repository": "https://github.com/shteynu/agent-skills",
+  "license": "MIT",
   "keywords": [
     "workflow",
     "handoff",
