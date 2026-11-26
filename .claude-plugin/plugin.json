@@ -1,13 +1,23 @@
 {
   "name": "agent-skills",
   "displayName": "Agent Skills",
-  "description": "A universal skill tree for AI agents and agent pipelines: role and file discipline, human decision gates, verifiable citations, sources, third-party rights, multilingual equivalence, simulated users, personal data, versioning, and the engineering layer (verification, architecture records, implementation, review, QA, evals, orchestration, task handoff, gates, retrieval contract).",
+  "description": "A universal skill tree for AI agents and agent pipelines: role and file discipline, human decision gates, verifiable citations, sources, third-party rights, multilingual equivalence, simulated users, personal data, versioning, and the engineering layer (verification, architecture records, implementation, review, QA, evals, orchestration, task handoff, session management, gates, retrieval contract).",
   "author": {
     "name": "shteynu",
     "url": "https://github.com/shteynu"
   },
   "repository": "https://github.com/shteynu/agent-skills",
-  "keywords": ["workflow", "handoff", "task-tracking", "verification", "multi-agent", "pipeline", "human-in-the-loop", "evals", "rag"],
+  "keywords": [
+    "workflow",
+    "handoff",
+    "task-tracking",
+    "verification",
+    "multi-agent",
+    "pipeline",
+    "human-in-the-loop",
+    "evals",
+    "rag"
+  ],
   "skills": [
     "./skill-authoring",
     "./agent-foundations",
@@ -28,6 +38,7 @@
     "./agent-evals",
     "./orchestration",
     "./task-tracker",
+    "./session-management",
     "./gate-management",
     "./retrieval-corpus"
   ]
