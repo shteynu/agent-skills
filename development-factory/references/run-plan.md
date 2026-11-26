@@ -37,21 +37,29 @@ lines:
         skill: product-spec  # or the project skill the binding names
         runs_in: line-session    # this-session | line-session | own-session | subagent
         context: fresh           # fresh | the line's (only for product, architect, implementer)
+        model: <model>           # the name the binding gives this role, or inherited
+        effort: <effort>         # the client's effort level the binding names, or inherited
         after: []                # roles it waits for; a human gate is named as gate:<what>
       - role: implementer
         skill: implementation
         runs_in: line-session
         context: the line's
+        model: <model>
+        effort: <effort>
         after: [product, "gate:spec approved"]
       - role: reviewer
         skill: code-review
         runs_in: subagent
         context: fresh
+        model: <model>           # another model than the implementer's where the binding names one
+        effort: <effort>         # never lower than the implementer's
         after: [implementer]
       - role: qa
         skill: qa-testing
         runs_in: own-session     # parallel with the implementer once the spec is approved
         context: fresh
+        model: <model>
+        effort: <effort>
         after: ["gate:spec approved"]
     skipped_roles: {}        # {product: "approved spec docs/specs/x.md exists"}
     skills: [<other skill>]
@@ -67,6 +75,10 @@ topology:
   limits:
     writers_at_once: 2
     source: <binding field, or "default">
+models:
+  source: <binding field for models and effort, or "none: inherited">
+  read_only_pieces: {model: <model>, effort: <effort>}   # searches and lookups in subagents
+  conflicts: []              # binding values that break SKILL.md `Where each role runs`, put to the owner
 skill_actions: []            # [{gap: G1, action: fix | extend | new | propose-shared | ask-owner}]
 ```
 

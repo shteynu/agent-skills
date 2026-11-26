@@ -161,11 +161,37 @@ Do not open a session:
 - **Isolation.** A worker that writes gets its own worktree and branch
   unless it is the only writer in the shared checkout (`One writer per
   worktree`). A worker that only reads may share the checkout.
-- **Model.** The binding names which model serves which kind of work. Where
-  it allows, a read-only or mechanical worker may run on a cheaper model.
-  Never switch a worker to a cheaper model to stay within a budget: an
+- **Model and effort.** The binding names, for each kind of work, which
+  model serves it and, where the client has the setting, how much reasoning
+  effort. Take both from the binding when opening a worker or a subagent,
+  and record them with the line: in the plan's role entry, or in the
+  register's log. Record what the client actually applies: a client may cap
+  a worker at the manager's own level, or ignore a value it does not offer.
+  Where the binding names none, pass the manager's own model and effort,
+  recorded as `inherited`; a client's own default for a worker (a model
+  fixed on an agent type, a configured default) is not `inherited`, so pass
+  the value or record the default. Within what the binding allows:
+  - a read-only or mechanical worker (a search, a lookup, a format
+    conversion) may run on a cheaper model or at lower effort;
+  - work that judges or feeds other work (a spec, a decision record, a
+    review, a grader) never runs at lower effort than the work it judges or
+    feeds;
+  - a worker that copies the manager's conversation runs on the manager's
+    model and effort where the client cannot change them for a copy, so
+    work that needs another model starts fresh.
+
+  Where the binding's values break these rules, or name some kinds of work
+  and not others, take the binding's values, record the conflict and ask
+  the owner. Where the client cannot apply the binding's value, run the
+  work where it can (a subagent instead of a session, or a session the
+  owner starts) or ask the owner; never record a value the client did not
+  apply.
+
+  Never lower a worker's model or effort to stay within a budget: an
   exceeded budget is a recorded failure
-  ([orchestration](../orchestration/SKILL.md) `Budget`).
+  ([orchestration](../orchestration/SKILL.md) `Budget`). A retry on a
+  stronger model or at higher effort is a change of the line's plan, logged
+  with its reason, never a silent way past a failing check.
 - **Permissions.** A worker runs with the same or narrower permissions than
   the manager. Never start one in a more permissive mode to get past a block
   (`Permission blocks`).
