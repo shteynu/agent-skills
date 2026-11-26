@@ -20,6 +20,10 @@ const { cases } = JSON.parse(fs.readFileSync(path.join(here, 'eval-cases.json'),
 
 const has = (text, needle) => String(text ?? '').toLowerCase().includes(needle.toLowerCase());
 const actions = (a) => a.skill_actions ?? [];
+const planRoles = (a) => (a.plan?.lines ?? []).flatMap((l) => l.roles ?? []);
+const allRoles = (a) => [...planRoles(a), ...(a.role_starts ?? [])];
+const roleNames = (a) => new Set(allRoles(a).map((r) => r.role));
+const SEPARATE = ['subagent', 'own-session'];
 
 export const CHECKS = {
   no_plan: (a, want) => (a.plan == null) === want,
@@ -60,6 +64,26 @@ export const CHECKS = {
   edits_shared_copy: (a, want) => Boolean(a.edits_shared_copy) === want,
   topology_change_recorded: (a, want) => Boolean(a.topology_change?.recorded) === want,
   change_reason_mentions: (a, want) => has(a.topology_change?.reason, want),
+  roles_first: (a, want) => (a.plan?.lines ?? []).some((l) => l.roles?.[0]?.role === want),
+  roles_include: (a, want) => want.every((r) => roleNames(a).has(r)),
+  roles_exclude: (a, want) => want.every((r) => !roleNames(a).has(r)),
+  roles_order: (a, want) =>
+    (a.plan?.lines ?? []).some((l) => {
+      const order = (l.roles ?? []).map((r) => r.role);
+      const idx = want.map((r) => order.indexOf(r));
+      return idx.every((i) => i >= 0) && idx.every((i, k) => k === 0 || i > idx[k - 1]);
+    }),
+  role_fresh: (a, want) =>
+    want.every((name) => {
+      const found = allRoles(a).filter((r) => r.role === name);
+      return found.length > 0 && found.every((r) => r.context === 'fresh' && SEPARATE.includes(r.runs_in));
+    }),
+  role_runs_in: (a, want) => {
+    const found = allRoles(a).filter((r) => r.role === want.role);
+    return found.length > 0 && found.every((r) => want.in.includes(r.runs_in));
+  },
+  skipped_has: (a, want) => (a.plan?.lines ?? []).some((l) => l.skipped_roles && want in l.skipped_roles),
+  returns_to: (a, want) => a.returns_to === want,
 };
 
 export function gradeCase(spec, answer) {

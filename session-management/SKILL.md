@@ -178,7 +178,10 @@ says:
 1. Where to start. The project's agent instructions and the branch's task
    file come first; the brief never replaces them.
 2. The task: the line id, the branch, the worktree, the files or area, and
-   the next concrete step.
+   the next concrete step. Where the work has roles, the worker's role, its
+   role skill, the files it receives from the role before it, and the work
+   it leaves to other roles
+   ([development-factory](../development-factory/SKILL.md) `Roles`).
 3. What done looks like, as checks that can be run.
 4. When to stop: a block, owner-gated work only, or degraded context, each
    ending with saved progress and a report.

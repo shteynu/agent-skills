@@ -28,17 +28,26 @@ U1  agent-foundations               baseline rules for any agent role
 ├── U8  persona-simulation          simulated users: a filter, never data
 ├── U9  personal-data-handling      minimization, thresholds, suppression
 └── E0  verification                proportional checks, evidence format
-    ├── E1  architecture-decisions  ADRs, schemas as contracts
-    ├── E2  implementation          building to spec in small steps
-    ├── E3  code-review             independent review, findings
-    ├── E4  qa-testing              tests from spec, pipeline properties
-    │   └── E5  agent-evals         eval sets, baseline-regression gate
+    ├── E12 product-spec            role: spec with checkable criteria
+    ├── E1  architecture-decisions  role: ADRs, schemas as contracts
+    ├── E2  implementation          role: building to spec in small steps
+    ├── E3  code-review             role: independent review, findings
+    ├── E4  qa-testing              role: tests from spec, pipeline properties
+    │   └── E5  agent-evals         role: eval sets, baseline-regression gate
     ├── E7  task-tracker            task files, handoff, Git safety
-    │   └── E10 session-management  coordinating worker sessions
-    │       └── E11 development-factory  topology, staffing, skill gaps
+    │   └── E10 session-management  opening, briefing, checking sessions
     ├── E8  gate-management         fitness gates and their rules
     └── E9  retrieval-corpus        RAG contract (+ evidence-citing)
+
+E11 development-factory             entry point of the E layer: intake,
+                                    lines, roles E12 E1-E5 and where each
+                                    runs, topology, skill gaps; runs the
+                                    sessions through E10
 ```
+
+`development-factory` sits above the tree rather than inside it: it depends
+on the role skills and on `session-management`, and it is the first skill a
+substantial development task opens.
 
 Dependencies are declared in each skill's frontmatter under
 `metadata.depends-on`; `metadata.tree-code` gives its place in the tree. A
@@ -73,12 +82,14 @@ purely engineering project needs only `U0`, `U1` and the `E` branch.
 | [orchestration](orchestration/SKILL.md) | The coordinator as code, visible failure, retries and idempotency, budgets, resuming, autonomous runs. |
 | [task-tracker](task-tracker/SKILL.md) | Work continuity: branch-scoped task files, session start/resume, saving progress, handoffs and their visibility boundaries, parallel-agent Git safety, escalation. |
 | [session-management](session-management/SKILL.md) | The coordinating session as manager of worker sessions: the run register, client capabilities and fallbacks, when to open or keep a session, choosing and briefing a worker, one writer per worktree, reports as claims, silent or crashed workers, continue/replace/stop, integrating lines, run limits and closing, replacing the manager, relaying the owner, permission blocks; templates for the register, brief and report; client profiles for the Claude desktop app and the Claude Code CLI. |
-| [development-factory](development-factory/SKILL.md) | The manager of a development factory: intake that sends small tasks straight back, lines of work, choosing the topology (this session, subagents, parallel sessions, chain of phases), staffing lines with skills, skill gaps (fix, extend, new, propose shared), the retrospective; the run plan, gap log and an evaluation set for its own decisions. |
+| [product-spec](product-spec/SKILL.md) | The product role: a spec for others to build and test against, scope and non-goals, numbered acceptance criteria each with its check, open questions instead of invented requirements, approval and versions. |
+| [development-factory](development-factory/SKILL.md) | The manager of a development factory and entry point of the E layer: intake that sends small tasks straight back, lines of work, the chain of roles for each kind of line (product, architect, implementer, reviewer, QA, evals) and where each role runs with a fresh context, choosing the topology (this session, subagents, parallel sessions, chain of phases), staffing lines with skills, skill gaps (fix, extend, new, propose shared), the retrospective; the run plan, gap log and an evaluation set for its own decisions. |
 | [gate-management](gate-management/SKILL.md) | Red gates, what deserves a gate, the shape of a gate, wiring, generated artifacts, the inventory. |
 | [retrieval-corpus](retrieval-corpus/SKILL.md) | The RAG contract: who builds what, span-based fragment ids, `search` / `get` / `verify_quote` / `list_sources`, normalization, quality set. The owner implements the search. |
 
-Skills without an evaluation set are drafts by the tree's own rule; none of
-the role skills here (`E1`–`E4`) has one yet, and none has had its second
+Skills without an evaluation set are drafts by the tree's own rule. Of the
+role skills here, `E1`–`E4` have no set yet, `E12` has a designed set that
+has not been run, and `E11` has a run baseline; none has had its second
 consumer.
 
 Each skill opens with a `How to read this skill` section: which sections are

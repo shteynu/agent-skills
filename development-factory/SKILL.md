@@ -1,9 +1,9 @@
 ---
 name: development-factory
-description: The manager of a development factory - takes in any substantial task, splits it into lines of work, decides whether it runs in this session, with subagents, in parallel sessions or as a chain of phases, staffs each line with the skills that cover it, notices when a skill is missing or keeps failing and writes or proposes one, and closes each phase with a retrospective that feeds the skills. Use at the start of any substantial task in a repository that uses this collection (a feature, a phase, a project, a multi-step change), when the same problem recurs, or when a phase or run ends. Not for a question, a lookup or a single edit: the intake sends those straight back to the session. How sessions are opened and checked is session-management; one session's handoff is task-tracker.
+description: The manager of a development factory and the entry point of the engineering layer - takes in any substantial task, splits it into lines of work, gives each line its chain of development roles (product, architect, implementer, reviewer, QA, evals) and decides which role runs in which session or subagent with a fresh context, chooses whether the lines run in this session, with subagents, in parallel sessions or as a chain of phases, staffs each role with its skill, notices when a skill is missing or keeps failing and writes or proposes one, and closes each phase with a retrospective that feeds the skills. Use at the start of any substantial task in a repository that uses this collection (a feature, a bug fix, a phase, a project, a multi-step change), when deciding which agent or session should do the next piece of development, when the same problem recurs, or when a phase or run ends. Not for a question, a lookup or a single edit: the intake sends those straight back to the session. How sessions are opened and checked is session-management; one session's handoff is task-tracker; each role's own rules are in its role skill.
 metadata:
   tree-code: E11
-  depends-on: session-management, task-tracker, skill-authoring, agent-evals, orchestration, human-gates
+  depends-on: session-management, task-tracker, product-spec, architecture-decisions, implementation, code-review, qa-testing, agent-evals, skill-authoring, orchestration, human-gates
 ---
 
 # Development Factory
@@ -24,6 +24,8 @@ Always in force:
 
 Conditional:
 - `Lines of work`: the intake found a substantial task.
+- `Roles`: lines are known and each needs its chain of roles, or a role
+  hands work back to another.
 - `Choosing the topology`: lines are known, or a recorded topology no
   longer fits.
 - `Staffing with skills`: a topology is chosen and lines need workers.
@@ -90,6 +92,79 @@ neither needs the other's result.
 
 Do not split for its own sake. One line is the right answer for most tasks.
 
+## Roles
+
+A line of development work passes through roles. Each role has its own
+skill, reads files and writes files; no role does another's work, and the
+roles hand work to each other only through those files.
+
+| Role | Skill | Reads | Writes |
+| --- | --- | --- | --- |
+| product | [product-spec](../product-spec/SKILL.md) | the request | a spec with numbered acceptance criteria, each with a check |
+| architect | [architecture-decisions](../architecture-decisions/SKILL.md) | the spec | a decision record, schema drafts, implementation steps |
+| implementer | [implementation](../implementation/SKILL.md) | the approved spec and record | commits with tests on the line's branch |
+| reviewer | [code-review](../code-review/SKILL.md) | the diff, the spec, the record | findings and a verdict |
+| QA | [qa-testing](../qa-testing/SKILL.md) | the spec, not the code | tests from the spec and a coverage report |
+| evals | [agent-evals](../agent-evals/SKILL.md) | the changed role skill, prompt or model | the set's results against its baseline |
+
+The binding may name a project skill that replaces a role's skill for the
+project's own kind of work; the factory takes the binding's name.
+
+### The chain for each kind of line
+
+Take the first row that fits the line:
+
+| Line | Chain |
+| --- | --- |
+| A change to an agent role skill, prompt or model assignment | implementer → evals → reviewer |
+| A change that crosses components or roles, adds or changes a schema or an interface, or picks a technology | product → architect → implementer → reviewer → QA |
+| A feature or any change of behaviour a user or a client sees | product → implementer → reviewer → QA |
+| A bug fix whose cause is not yet known, or that changes what users see | implementer (reproduce with a failing test first) → reviewer → QA |
+| A bug fix with a known cause in one area, or a refactor with no change of behaviour | implementer → reviewer |
+
+- **Skip product** when an approved spec for the line already exists, or the
+  request itself states acceptance criteria that can each be checked;
+  record that text as the spec.
+- **Human gates sit between roles.** The spec and the decision record are
+  approved by whoever the binding names before the implementer starts;
+  where the binding allows, provisionally. Merging stays the owner's
+  ([human-gates](../human-gates/SKILL.md)).
+- **Returns go back one role.** Reviewer findings and failing QA tests go
+  back to the implementer; a spec found silent or wrong goes back to
+  product. When a role reports that the spec contradicts the code or
+  another requirement, the line goes to product, not back to the
+  implementer: product answers with a new version or a question to the
+  owner ([product-spec](../product-spec/SKILL.md) `Approval and versions`).
+  After the same return on the same cause the number of times the binding
+  names, two by default, stop the loop, log a gap signal and ask the owner;
+  the line still goes to the role that owns the cause, and waits there for
+  the answer.
+
+### Where each role runs
+
+- **The writer never checks its own work.** The reviewer and QA always start
+  with a fresh context: a subagent, or a session of their own. Never in the
+  implementer's session, never with a copy of the implementer's
+  conversation. They read the files, not the history.
+- **Another model** for the reviewer and QA, where the binding names one.
+- **Product and architect** run before the implementer in the line's own
+  session, or as a session of their own when the spec or the record needs
+  research or rounds with the owner.
+- **The implementer** is the line's worker: this session for the topology
+  `This session`, otherwise the line's session.
+- **QA in parallel.** Once the spec is approved, QA may run as a session of
+  its own alongside the implementer, writing tests from the spec in files
+  the implementer does not touch. Its branch is integrated with the
+  implementer's ([session-management](../session-management/SKILL.md)
+  `Integrating lines`). Otherwise QA runs after the reviewer passes the
+  change.
+- **Evals** run as a subagent or a session of their own, never as part of
+  the change they evaluate.
+
+Each role's place is recorded in the plan
+([references/run-plan.md](references/run-plan.md)): which role, which
+skill, where it runs, and from which context.
+
 ## Choosing the topology
 
 Take the first topology whose condition holds, and record why the ones
@@ -114,9 +189,9 @@ parallel lines inside one phase. Record each level.
   models serve which work come from the binding, through
   [session-management](../session-management/SKILL.md) `Run limits and
   closing` and `Choosing the worker`.
-- **Review is not a line.** An independent review of a line's work runs as a
-  subagent or a worker on another model, inside that line. Writer and
-  reviewer never share a session.
+- **Roles are not lines.** The roles of one line run inside that line, as
+  `Roles` places them; they count toward the topology only when a role runs
+  as a session of its own.
 - **Revisit** the topology when a line's assumption breaks, a new
   independent line appears, a line is blocked for long, or a worker's
   context is degraded. Record the change and its reason; never change it
@@ -126,13 +201,14 @@ The record format is in [references/run-plan.md](references/run-plan.md).
 
 ## Staffing with skills
 
-For each line, list the skills that cover its work. Take them from the
-project's routing (its agent instructions or the client's skill list), not
-from memory.
+For each role of each line, name the skill that covers it, and the other
+skills the work needs. Take them from the project's routing (its agent
+instructions or the client's skill list) and the binding, not from memory.
 
-- A line whose work no skill covers, or covers only in part, raises a gap
-  signal (`Skill gaps`).
-- Each worker's brief names its skills in reading order
+- A role or a line whose work no skill covers, or covers only in part,
+  raises a gap signal (`Skill gaps`).
+- Each worker's brief names its role, its role skill and the other skills
+  in reading order, and what it must not do because another role does it
   ([session-management](../session-management/SKILL.md) `The brief`).
 - A worker on a line with a known open gap gets the gap in its brief, so it
   records what it learns instead of guessing silently.
@@ -219,14 +295,17 @@ itself; those changes are lines of their own or decisions of the owner.
   binding, the task files, the run register and the gap log when they exist.
   A missing binding value is taken from the defaults above and recorded as a
   default.
-- **Output:** the run plan in the register, entries in the gap log, skill
-  proposals, retrospective notes. For a small task: nothing.
-- **Does not:** do a line's work once it has given it to a worker; review
-  its own lines' output; accept its own skill proposals; grant itself or a
-  worker any permission; start parallel sessions without the owner's
+- **Output:** the run plan in the register, with each line's chain of roles
+  and where each role runs; entries in the gap log, skill proposals,
+  retrospective notes. For a small task: nothing.
+- **Does not:** do a role's work once it has given it to a worker; review
+  its own lines' output; put a reviewer or QA in the implementer's context;
+  approve a spec or a record; accept its own skill proposals; grant itself
+  or a worker any permission; start parallel sessions without the owner's
   consent.
 - **Escalate when:** the goal or done-when cannot be stated from the
-  request; every topology needs a decision only the owner can make; a gap
-  can be closed only by widening a permission or a gate; the plan needs
-  more sessions or budget than the binding allows. Use the format in
+  request; every topology needs a decision only the owner can make; a
+  return loop between roles reaches its limit; a gap can be closed only by
+  widening a permission or a gate; the plan needs more sessions or budget
+  than the binding allows. Use the format in
   [agent-foundations](../agent-foundations/SKILL.md) `Escalation`.
