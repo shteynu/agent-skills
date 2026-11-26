@@ -20,7 +20,9 @@ intake:
   human_decisions:
     - <decision, owner per the binding>
   size: substantial          # small never reaches a plan
-  consent_multi_agent: yes   # yes | no | unknown; source below
+  consent_multi_agent: yes   # yes: recorded consent; no: the project requires
+                             # consent and none is recorded, or the owner refused;
+                             # unknown: the project says nothing either way
   consent_source: <decision-log id or the owner's words and date>
 lines:
   - id: L1
@@ -32,7 +34,9 @@ lines:
     skills: [<skill>, <skill>]
     gaps: []                 # gap ids from the gap log
 topology:
-  kind: parallel-sessions    # this-session | subagents | parallel-sessions | phase-chain
+  kind: parallel-sessions    # what actually runs: this-session | subagents | parallel-sessions | phase-chain
+  preferred: null            # what the factory would run if consent or a limit did not
+                             # stop it; null when it equals kind
   levels: []                 # for combinations: [{line: L1, kind: subagents}]
   rejected:
     this-session: <why not>

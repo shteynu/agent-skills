@@ -8,7 +8,9 @@ metadata:
 
 # Development Factory
 
-Draft: no evaluation baseline recorded and one consumer so far
+Draft: an evaluation baseline is recorded (at the ceiling; see
+[references/eval-set.md](references/eval-set.md)), but there is one consumer
+so far and no approval by the layer's owner
 ([skill-authoring](../skill-authoring/SKILL.md) `Done`).
 
 ## How to read this skill
@@ -104,8 +106,10 @@ Combinations are allowed: a chain of phases whose phases use subagents, or
 parallel lines inside one phase. Record each level.
 
 - **No consent.** Without the owner's consent to multi-agent work, the
-  factory records the topology it would choose and why, runs the task in
-  this session or as a chain the owner starts, and asks once.
+  factory records the topology it would choose as `preferred`, with why,
+  runs the task in this session or as a chain the owner starts (that is the
+  `kind`), and asks once. Consent that the project requires and that is not
+  recorded counts as `no`, not `unknown`.
 - **Limits.** The number of sessions writing at once, the budget and which
   models serve which work come from the binding, through
   [session-management](../session-management/SKILL.md) `Run limits and
