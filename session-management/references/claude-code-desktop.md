@@ -1,26 +1,48 @@
 # Client profile: the Claude desktop app (Code tab)
 
 Open this when the coordinating session runs in the Claude desktop app. It
-maps the rules in [../SKILL.md](../SKILL.md) onto that client's tools and
-limits. The tool names and limits below were observed on 2026-11-26. Check
-them against the tools your session actually lists before relying on them.
+maps [../SKILL.md](../SKILL.md) `Client capabilities` onto that client's
+tools and limits. Lines marked *observed* were seen in a run on 2026-11-26;
+the rest come from the app's tool descriptions on the same date. Check them
+against the tools your session actually lists before relying on them.
 
-## Tools
+## Capabilities
 
-| Rule | Tool |
+| Capability | Tool |
 | --- | --- |
-| Open a session | `start_session`. `initiation: user_asked` starts it now; `own_initiative` only shows a card the owner must start; `offer` asks the owner first. `context: fresh` needs a self-contained `prompt` and `background`. |
-| Shared or own worktree | `use_worktree: false` shares the manager's checkout, so only one writer may run there. `true` gives the session its own worktree and branch. |
-| Continue a worker | `SendMessage` with `to` set to its `local_...` session id. A busy worker holds the message until its turn ends. |
-| Know its state | `list_sessions` with `linked: true`, or `get_session`, which shows `isRunning` and `permissionMode`. |
-| Stop a worker | `stop_session`. It interrupts the turn, and messages already queued for the worker run next. |
-| Hand off your own task | `hand_off_to_session`, when a new owner message is about something else. |
+| open | `start_session`. `initiation: user_asked` starts it now; `own_initiative` only shows a card the owner must start, and the card expires after a week; `offer` asks the owner first. `context: fresh` needs a self-contained `prompt` and `background`; `context: fork` copies the manager's conversation. `model` picks a cheaper model for a read-only worker where the binding allows. The result gives the session a short name and a `local_...` id: record both in the register. |
+| isolate | `use_worktree: true` gives the session its own worktree and branch. `use_worktree: false` shares the manager's folder, so only one writer may run there; when the manager itself runs in a worktree, `false` means that same worktree and branch. |
+| message | `SendMessage` with `to` set to the `local_...` id, never a display name. A busy worker holds the message until its turn ends. |
+| observe | `list_sessions` with `linked: true`, or `get_session`, which shows `isRunning` and `permissionMode`. |
+| stop | `stop_session`. It interrupts the turn, and messages already queued for the worker run next. *Observed.* |
+
+`hand_off_to_session` moves the manager's own unfinished task to a new
+session when a new owner message is about something else. In a worktree,
+commit first: the new session starts from the branch tip.
+
+## Reports
+
+- When a worker ends a turn, the session that started it, or the session
+  whose message began that turn, gets a note. The note quotes the first 400
+  characters of the worker's latest report. So the worker's report starts
+  with its status line, and the manager reads the rest from the task file
+  and the branch before acting.
+- A replacement manager receives a worker's notes only after it has sent
+  that worker a message (`Replacing the manager` step 3).
+- Notes from a turn the owner drove, or from a turn that was stopped or
+  failed, wait for the manager's next turn. A cloud session sends no note.
+- A worker in its own worktree commits to its own branch, which the note
+  names when the app knows it. The manager's checkout has none of that work
+  until the branch is merged, and merging follows `Integrating lines`.
 
 ## Limits
 
 - **Who may start a session.** In a turn that a worker's report woke, and
   not an owner's message, the app refuses `start_session`. Only a card can
-  be shown. Sending a running worker its next step is still possible.
+  be shown. Sending a running worker its next step is still possible. One
+  exception: in a report-driven turn right after the owner's own turn, a
+  step the owner asked to have in its own session may still start, in the
+  same project. *Refusal observed.*
 - **Automatic continues pause.** After many report-driven turns in a row
   without an owner message, reports wait for the owner's next message.
   Tell the owner when that is near, so a long run does not stall unseen.
@@ -34,14 +56,16 @@ them against the tools your session actually lists before relying on them.
 
 - Files: the user's global `~/.claude/settings.json` and the project's
   `.claude/settings.json` (shared, in Git). A deny rule in either beats an
-  allow rule in either.
+  allow rule in either. *Observed.*
 - A pattern matches from the start of the command. `git push origin:*`
   does not match `git push -u origin ...`, nor `git -C <path> push`, nor a
   push chained after another command with `&&`. Run such commands alone.
+  *Observed.*
 - A settings change was picked up by the running session without a
-  restart, at least for Bash rules.
+  restart, at least for Bash rules. *Observed once.*
 - The auto-mode classifier can refuse an action that no rule names, for
   example creating a scheduled task. Treat it as a permission block.
+  *Observed.*
 - When the owner edits settings by hand, check which file changed: pasting
   the global file into the project file replaces the project's own rules
-  and plugins.
+  and plugins. *Observed.*
