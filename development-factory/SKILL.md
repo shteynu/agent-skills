@@ -146,7 +146,14 @@ Take the first row that fits the line:
   with a fresh context: a subagent, or a session of their own. Never in the
   implementer's session, never with a copy of the implementer's
   conversation. They read the files, not the history.
-- **Another model** for the reviewer and QA, where the binding names one.
+- **Model and effort for each role** come from the binding
+  ([session-management](../session-management/SKILL.md) `Choosing the
+  worker`). The reviewer and QA run on another model than the implementer
+  where the binding names one, and never at lower effort than the
+  implementer. In evals, the role under test runs on the model and effort
+  the changed role will run on; a rubric's grader runs on another model.
+  Where the binding names nothing for a role, it is recorded as
+  `inherited`.
 - **Product and architect** run before the implementer in the line's own
   session, or as a session of their own when the spec or the record needs
   research or rounds with the owner.
@@ -163,7 +170,7 @@ Take the first row that fits the line:
 
 Each role's place is recorded in the plan
 ([references/run-plan.md](references/run-plan.md)): which role, which
-skill, where it runs, and from which context.
+skill, where it runs, from which context, and on which model and effort.
 
 ## Choosing the topology
 
@@ -173,7 +180,7 @@ before it did not:
 | Topology | Condition |
 | --- | --- |
 | **This session** | One line, it fits one context, and no piece of it is independent enough to hand off. |
-| **This session with subagents** | One line, but it has pieces that return a result inside one step: a search across many files, an independent review, an evaluation, separate parts of one change that do not share files. |
+| **This session with subagents** | One line, but it has pieces that return a result inside one step: a search across many files, an evaluation, separate parts of one change that do not share files. The line's own reviewer or QA in a subagent is not such a piece (`Roles are not lines`). |
 | **Parallel sessions** | Two or more lines that need no result from each other and touch no common files, and the owner has consented to multi-agent work. |
 | **Chain of phases** | Lines depend on each other in order, or the whole does not fit one context. Each phase is a session on its own branch, opened when the one before ends. |
 
@@ -191,7 +198,9 @@ parallel lines inside one phase. Record each level.
   closing` and `Choosing the worker`.
 - **Roles are not lines.** The roles of one line run inside that line, as
   `Roles` places them; they count toward the topology only when a role runs
-  as a session of its own.
+  as a session of its own. A reviewer or QA in a subagent leaves the
+  topology as it was: one line with no other piece to hand off is still
+  `This session`.
 - **Revisit** the topology when a line's assumption breaks, a new
   independent line appears, a line is blocked for long, or a worker's
   context is degraded. Record the change and its reason; never change it
@@ -300,6 +309,7 @@ itself; those changes are lines of their own or decisions of the owner.
   retrospective notes. For a small task: nothing.
 - **Does not:** do a role's work once it has given it to a worker; review
   its own lines' output; put a reviewer or QA in the implementer's context;
+  run a role below the model or effort the binding names for it;
   approve a spec or a record; accept its own skill proposals; grant itself
   or a worker any permission; start parallel sessions without the owner's
   consent.
@@ -307,5 +317,6 @@ itself; those changes are lines of their own or decisions of the owner.
   request; every topology needs a decision only the owner can make; a
   return loop between roles reaches its limit; a gap can be closed only by
   widening a permission or a gate; the plan needs more sessions or budget
-  than the binding allows. Use the format in
+  than the binding allows; the client does not offer the model or effort
+  the binding names for a role. Use the format in
   [agent-foundations](../agent-foundations/SKILL.md) `Escalation`.

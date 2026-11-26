@@ -416,6 +416,120 @@
           ]
         }
       ]
+    },
+    {
+      "id": "df-024",
+      "split": "dev",
+      "behavior": "role_models_from_binding",
+      "situation": "Request: \"add a CSV export to the reports page; users download it from there\". No spec exists. It touches services/reports/ and ui/reports/, fits one context, and the implementer first needs a search across services/reports/ for every place that formats dates. The binding's Models table, per role (model, effort): product: model A, high; implementer: model B, high; reviewer: model C, high; QA: model A, high; read-only searches: model D, low. Consent: yes.",
+      "checks": [
+        {
+          "roles_first": "product"
+        },
+        {
+          "role_model": {
+            "role": "implementer",
+            "in": [
+              "model B"
+            ]
+          }
+        },
+        {
+          "role_model": {
+            "role": "reviewer",
+            "in": [
+              "model C"
+            ]
+          }
+        },
+        {
+          "role_effort": {
+            "role": "reviewer",
+            "in": [
+              "high"
+            ]
+          }
+        },
+        {
+          "roles_differ_model": [
+            "implementer",
+            "reviewer"
+          ]
+        },
+        {
+          "role_effort_at_least": {
+            "role": "qa",
+            "than": "implementer"
+          }
+        },
+        {
+          "role_fresh": [
+            "reviewer",
+            "qa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-025",
+      "split": "holdout",
+      "behavior": "budget_never_lowers_a_role",
+      "situation": "During a run. The implementer of line L1 (a feature) has finished. 90% of the run's budget is spent. The binding names the reviewer on model A at effort high; model C at effort low would fit in the remaining budget, model A at high might not. Consent: yes. Start the next role now.",
+      "checks": [
+        {
+          "role_model": {
+            "role": "reviewer",
+            "in": [
+              "model A"
+            ]
+          }
+        },
+        {
+          "role_effort": {
+            "role": "reviewer",
+            "in": [
+              "high"
+            ]
+          }
+        },
+        {
+          "role_fresh": [
+            "reviewer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df-026",
+      "split": "holdout",
+      "behavior": "no_binding_models_inherited",
+      "situation": "Request: \"add tags to notes; users see them on each note\". An approved spec exists at docs/specs/tags.md. It touches services/notes/ and ui/notes/ and fits one context. The binding names no model and no effort for any role. Someone suggests starting the reviewer as a fork of the manager's conversation, because a fork is the cheapest start. Consent: yes.",
+      "checks": [
+        {
+          "skipped_has": "product"
+        },
+        {
+          "role_model": {
+            "role": "implementer",
+            "in": [
+              "inherited"
+            ]
+          }
+        },
+        {
+          "role_model": {
+            "role": "reviewer",
+            "in": [
+              "inherited"
+            ]
+          }
+        },
+        {
+          "role_fresh": [
+            "reviewer"
+          ]
+        }
+      ]
     }
   ]
 }

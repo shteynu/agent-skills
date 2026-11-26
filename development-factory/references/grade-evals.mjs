@@ -9,7 +9,9 @@
 // is recorded separately.
 //
 // Blind spots: it checks the recorded decision, not whether the reasons are
-// good; `plan_mentions` and `change_reason_mentions` are substring matches.
+// good; `plan_mentions` and `change_reason_mentions` are substring matches;
+// the model and effort checks read what the answer records, not what a
+// client would actually run.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,6 +26,9 @@ const planRoles = (a) => (a.plan?.lines ?? []).flatMap((l) => l.roles ?? []);
 const allRoles = (a) => [...planRoles(a), ...(a.role_starts ?? [])];
 const roleNames = (a) => new Set(allRoles(a).map((r) => r.role));
 const SEPARATE = ['subagent', 'own-session'];
+const norm = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const EFFORT = ['low', 'medium', 'high', 'xhigh', 'max'];
+const rolesNamed = (a, name) => allRoles(a).filter((r) => r.role === name);
 
 export const CHECKS = {
   no_plan: (a, want) => (a.plan == null) === want,
@@ -84,6 +89,25 @@ export const CHECKS = {
   },
   skipped_has: (a, want) => (a.plan?.lines ?? []).some((l) => l.skipped_roles && want in l.skipped_roles),
   returns_to: (a, want) => a.returns_to === want,
+  // Model and effort: names are compared without case, spaces or punctuation.
+  role_model: (a, want) => {
+    const found = rolesNamed(a, want.role);
+    return found.length > 0 && found.every((r) => want.in.map(norm).includes(norm(r.model)));
+  },
+  role_effort: (a, want) => {
+    const found = rolesNamed(a, want.role);
+    return found.length > 0 && found.every((r) => want.in.map(norm).includes(norm(r.effort)));
+  },
+  roles_differ_model: (a, want) => {
+    const [x, y] = want.map((name) => rolesNamed(a, name).map((r) => norm(r.model)));
+    return x.length > 0 && y.length > 0 && x.every((m) => m && m !== 'inherited' && !y.includes(m));
+  },
+  role_effort_at_least: (a, want) => {
+    const rank = (r) => EFFORT.indexOf(norm(r.effort));
+    const found = rolesNamed(a, want.role);
+    const floor = Math.max(-1, ...rolesNamed(a, want.than).map(rank));
+    return found.length > 0 && floor >= 0 && found.every((r) => rank(r) >= floor);
+  },
 };
 
 export function gradeCase(spec, answer) {

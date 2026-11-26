@@ -10,11 +10,27 @@ against the tools your session actually lists before relying on them.
 
 | Capability | Tool |
 | --- | --- |
-| open | `start_session`. `initiation: user_asked` starts it now; `own_initiative` only shows a card the owner must start, and the card expires after a week; `offer` asks the owner first. `context: fresh` needs a self-contained `prompt` and `background`; `context: fork` copies the manager's conversation. `model` picks a cheaper model for a read-only worker where the binding allows. The result gives the session a short name and a `local_...` id: record both in the register. |
+| open | `start_session`. `initiation: user_asked` starts it now; `own_initiative` only shows a card the owner must start, and the card expires after a week; `offer` asks the owner first. `context: fresh` needs a self-contained `prompt` and `background`; `context: fork` copies the manager's conversation. `model` picks the model the binding names for the work. The result gives the session a short name and a `local_...` id: record both in the register. |
 | isolate | `use_worktree: true` gives the session its own worktree and branch. `use_worktree: false` shares the manager's folder, so only one writer may run there; when the manager itself runs in a worktree, `false` means that same worktree and branch. |
 | message | `SendMessage` with `to` set to the `local_...` id, never a display name. A busy worker holds the message until its turn ends. |
 | observe | `list_sessions` with `linked: true`, or `get_session`, which shows `isRunning` and `permissionMode`. |
 | stop | `stop_session`. It interrupts the turn, and messages already queued for the worker run next. *Observed.* |
+
+## Model and effort
+
+- **A session.** `start_session` takes `model`; `set_session_model` and
+  `set_session_effort` change a running session's model and effort. Set
+  them from the binding before the worker's first step, not midway through
+  it.
+- **A subagent.** The `Agent` tool takes `model` (a family name such as
+  `opus`, `sonnet`, `haiku`) and `effort` (`low`, `medium`, `high`,
+  `xhigh`, `max`). The client sets effort only when the owner or an
+  instruction asks for it explicitly; a binding value is such an
+  instruction, so name its source in the plan. A `fork` subagent ignores
+  `model` and runs at the manager's effort: a role that needs another model
+  is never a fork.
+- An agent type defined in the client's agent files can fix its own model
+  and effort; the binding's value wins, so pass it explicitly.
 
 `hand_off_to_session` moves the manager's own unfinished task to a new
 session when a new owner message is about something else. In a worktree,

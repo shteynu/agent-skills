@@ -36,8 +36,13 @@ A subagent ends with the session that started it. Lines that must survive
   its output, which is a permission block for the line. Never start it with
   a flag that skips permission checks, and never in a wider permission mode
   than the manager's (`Choosing the worker`).
-- **Model.** `--model` picks the worker's model; use only what the binding
-  names for that kind of work.
+- **Model and effort.** For a headless session, `--model` picks the model;
+  use only what the binding names for that kind of work. Check
+  `claude --help` for an effort option before relying on one; where there
+  is none, record the effort as `inherited`. For a subagent, the `Agent`
+  tool takes `model` and `effort` as in
+  [claude-code-desktop.md](claude-code-desktop.md) `Model and effort`, and a
+  `fork` subagent keeps the manager's model and effort.
 - **Context compaction** happens in both kinds of worker. State lives in
   Git for that reason.
 
