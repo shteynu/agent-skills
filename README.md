@@ -35,6 +35,7 @@ U1  agent-foundations               baseline rules for any agent role
     │   └── E5  agent-evals         eval sets, baseline-regression gate
     ├── E7  task-tracker            task files, handoff, Git safety
     │   └── E10 session-management  coordinating worker sessions
+    │       └── E11 development-factory  topology, staffing, skill gaps
     ├── E8  gate-management         fitness gates and their rules
     └── E9  retrieval-corpus        RAG contract (+ evidence-citing)
 ```
@@ -72,6 +73,7 @@ purely engineering project needs only `U0`, `U1` and the `E` branch.
 | [orchestration](orchestration/SKILL.md) | The coordinator as code, visible failure, retries and idempotency, budgets, resuming, autonomous runs. |
 | [task-tracker](task-tracker/SKILL.md) | Work continuity: branch-scoped task files, session start/resume, saving progress, handoffs and their visibility boundaries, parallel-agent Git safety, escalation. |
 | [session-management](session-management/SKILL.md) | The coordinating session as manager of worker sessions: the run register, client capabilities and fallbacks, when to open or keep a session, choosing and briefing a worker, one writer per worktree, reports as claims, silent or crashed workers, continue/replace/stop, integrating lines, run limits and closing, replacing the manager, relaying the owner, permission blocks; templates for the register, brief and report; client profiles for the Claude desktop app and the Claude Code CLI. |
+| [development-factory](development-factory/SKILL.md) | The manager of a development factory: intake that sends small tasks straight back, lines of work, choosing the topology (this session, subagents, parallel sessions, chain of phases), staffing lines with skills, skill gaps (fix, extend, new, propose shared), the retrospective; the run plan, gap log and an evaluation set for its own decisions. |
 | [gate-management](gate-management/SKILL.md) | Red gates, what deserves a gate, the shape of a gate, wiring, generated artifacts, the inventory. |
 | [retrieval-corpus](retrieval-corpus/SKILL.md) | The RAG contract: who builds what, span-based fragment ids, `search` / `get` / `verify_quote` / `list_sources`, normalization, quality set. The owner implements the search. |
 
