@@ -1,7 +1,8 @@
 # Decision record
 
 Open this when writing to the decision queue or the decision log. The rules
-are in [../SKILL.md](../SKILL.md).
+are in [../SKILL.md](../SKILL.md); how to choose an `id` is in its
+`Identifiers`.
 
 ## Queue entry (waiting for a person)
 

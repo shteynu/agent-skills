@@ -60,7 +60,7 @@ purely engineering project needs only `U0`, `U1` and the `E` branch.
 | [skill-authoring](skill-authoring/SKILL.md) | Layers, frontmatter and dependencies, the reading map, the role contract, references, universality rules, readiness. |
 | [agent-foundations](agent-foundations/SKILL.md) | Stay in role, evidence before claims, never invent, work through files, report as it is, blocked means stop, escalation format. |
 | [pipeline-artifacts](pipeline-artifacts/SKILL.md) | Abstract unit of work, provenance fields, statuses and who may move them, reading and writing files, off-schema files. |
-| [human-gates](human-gates/SKILL.md) | Kinds of human decision, the no-agent rule, decision packets, the decision log and queue, provisional decisions in autonomous runs. |
+| [human-gates](human-gates/SKILL.md) | Kinds of human decision, the no-agent rule, decision packets, the decision log and queue and their ids across parallel branches, provisional decisions in autonomous runs. |
 | [evidence-citing](evidence-citing/SKILL.md) | Citation as fragment id plus verbatim quote, `not found` instead of the nearest passage, V / C / K codes, code-checked quotes. |
 | [source-research](source-research/SKILL.md) | Primary before secondary, legal access only, opened versus seen, recording sources, paywalls, re-verification. |
 | [third-party-rights](third-party-rights/SKILL.md) | Licence types and their traps, finding the terms, close paraphrase, the rights question for a person. |
@@ -134,9 +134,11 @@ keeps `agent-skills:code-review` apart from a client's built-in
   tracks this repository's commits. Pull them with
   `claude plugin update agent-skills@shteynu`, or turn on auto-update for the
   marketplace under **Marketplaces** in `/plugin`.
-- **Private repository.** Claude Code clones with the machine's own git
-  credentials and never prompts: a GitHub SSH key loaded in `ssh-agent`, or
-  `gh auth login` followed by `gh auth setup-git` for HTTPS.
+- **Access.** This repository is public, so the plugin install, a
+  submodule clone and a consumer's CI need no credentials. A private fork
+  does: Claude Code clones with the machine's own git credentials and never
+  prompts (a GitHub SSH key loaded in `ssh-agent`, or `gh auth login`
+  followed by `gh auth setup-git` for HTTPS), and CI needs a read token.
 - **Claude Code only.** Codex, Gemini CLI and other clients do not read
   Claude Code plugins; give them Option A or C.
 
