@@ -14,7 +14,9 @@ Always in force: `Independence` — without it the review is a second
 opinion of the author; `What to check` — the minimum every review covers;
 `Findings` — the only output format. Conditional: `Verifying claims` — the
 change or its description asserts something you can test; `Contract` — the
-role boundary.
+role boundary. The evaluation set is in
+[references/eval-set.md](references/eval-set.md), opened when this skill
+changes or a review in use passed a defect.
 
 ## Independence
 

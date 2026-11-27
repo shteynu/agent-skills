@@ -1,0 +1,67 @@
+{
+ "rubric": "criteria-observable",
+ "case": "ps-001",
+ "grader": "claude-sonnet-5-5",
+ "grades": [
+  {
+   "answer": "A1",
+   "score": 3,
+   "reason": "All criteria observable with proving checks; empty filter result and export failure are covered, the empty case via open question 2.",
+   "run": "haiku-run-3"
+  },
+  {
+   "answer": "A2",
+   "score": 3,
+   "reason": "Observable criteria with matching checks; empty result, permission, size limit and format covered as criteria tied to open questions.",
+   "run": "opus-run-1"
+  },
+  {
+   "answer": "A3",
+   "score": 3,
+   "reason": "Three observable criteria with proving checks; empty range (criterion 2) and server failure (criterion 3) are covered.",
+   "run": "haiku-run-5"
+  },
+  {
+   "answer": "A4",
+   "score": 3,
+   "reason": "Every criterion is observable with a proving check; empty result, permission and size limit are present via open questions.",
+   "run": "opus-run-4"
+  },
+  {
+   "answer": "A5",
+   "score": 3,
+   "reason": "Observable criteria with proving checks; empty table, permission and limit covered through open questions 2 and 4.",
+   "run": "opus-run-2"
+  },
+  {
+   "answer": "A6",
+   "score": 2,
+   "reason": "Criterion 3 requires a 'clear message', which is not observable, and the checks are marked 'blocked' rather than stating a proof. Criterion 4 fixes a header-only file for an empty range, which the request leaves open.",
+   "run": "haiku-run-1"
+  },
+  {
+   "answer": "A7",
+   "score": 3,
+   "reason": "Observable criteria with proving checks; empty case (criterion 4), permission (5) and server failure (6) are covered.",
+   "run": "opus-run-5"
+  },
+  {
+   "answer": "A8",
+   "score": 3,
+   "reason": "Few criteria, but each is observable with a proving check; the empty table and the filter case are covered through open questions.",
+   "run": "haiku-run-2"
+  },
+  {
+   "answer": "A9",
+   "score": 3,
+   "reason": "Observable criteria with proving checks, including the invalid range (criterion 3); the empty result is an open question. Criterion 2 assumes filtered rows while open question 1 is still open, but it can still be observed.",
+   "run": "haiku-run-4"
+  },
+  {
+   "answer": "A10",
+   "score": 3,
+   "reason": "Observable criteria with proving checks; empty result (4), limit (6), permission (7) and escaping (5) are covered.",
+   "run": "opus-run-3"
+  }
+ ]
+}

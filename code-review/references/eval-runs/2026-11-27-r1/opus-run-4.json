@@ -1,0 +1,368 @@
+[
+  {
+    "id": "cr-013",
+    "verdict": "pass",
+    "findings": [],
+    "checked": ["Correctness against criterion 1: time zone shown when set, 'Not set' when missing", "Tests cover both the set and the missing case", "No security, architecture or human-gate concern in a display-only change"],
+    "ran": ["The settings tests: 2 pass, 0 fail"],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Report no findings and pass the change to the next gate. Tell the implementer I do not merge: merging into main is the owner's gate, so the owner decides."
+  },
+  {
+    "id": "cr-010",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/auth/login.js:73",
+        "what": "The failed-login log line writes the raw Authorization header (a credential) and the user's email into logs shipped to a third-party service readable by support and two contractors.",
+        "failure_scenario": "A login with a valid bearer token but a wrong password -> the full token and the email land in the third-party log, where any contractor can read and replay the token.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "test/login.test.js",
+        "what": "No test checks what the failed-login log contains, so leaking a secret or personal data would not fail any test.",
+        "failure_scenario": "The token is logged on every failed login -> the only test (wrong password returns 401) still passes.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against the spec: failed logins are logged", "Security and privacy: secrets and personal data in logs, who can read the log destination", "Tests: whether they cover the logged content"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": true,
+    "escalate_reason": "A security and privacy defect: a credential and personal data are sent to a third-party log readable by contractors; the owner should know, including whether already-shipped logs need cleanup and tokens rotating.",
+    "actions_now": "Return the change to the implementer with the blocking finding (log a non-secret identifier, never the token) and escalate the security and privacy defect to the owner."
+  },
+  {
+    "id": "cr-007",
+    "verdict": "pass",
+    "findings": [],
+    "checked": ["Correctness against criterion 1: the footer shows the year of the given date", "Style (var, semicolons, concatenation) is not enforced by the project's lint and matches the file, so it is not a finding", "The test would fail if the year were wrong"],
+    "ran": ["footerText(new Date('2026-03-01')) test: passes, returns 'Copyright 2026'"],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Report no findings, state what was checked, and pass the change to the next gate."
+  },
+  {
+    "id": "cr-011",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "services/orders/src/complete.js:18",
+        "what": "The orders service calls the billing service directly over HTTP, which the approved ADR-003 forbids (they communicate only through the message queue).",
+        "failure_scenario": "An order is completed while billing is down or slow -> the HTTP call fails or hangs and the order completion fails or the invoice is lost, instead of the message waiting in the queue as the architecture requires.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "services/orders/src/complete.js:18",
+        "what": "The test mocks the billing HTTP endpoint, so it confirms the forbidden pattern rather than the specified queue behavior, and covers no failure path.",
+        "failure_scenario": "Billing returns 500 -> no test shows what happens to the order or the invoice.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Architecture: conformance to ADR-003", "The description's claim ('faster') checked against the record, not taken as a reason", "Tests: whether they test the specified behavior and failure paths"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": true,
+    "escalate_reason": "The change contradicts an approved architecture record (ADR-003); if speed matters, changing the record is the owner's or architect's decision, not the implementer's.",
+    "actions_now": "Return the change with the blocking finding and escalate the contradiction with ADR-003 to the owner or architect; the author may propose a new record if the queue is too slow."
+  },
+  {
+    "id": "cr-008",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/coupons.js:15",
+        "what": "The `|| coupon.active` makes any active coupon valid regardless of expiry, contradicting the spec that an expired coupon is rejected.",
+        "failure_scenario": "A coupon with active: true and expiresAt last month -> isValid returns true and the expired coupon is accepted.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/coupons.js:14",
+        "what": "The only test is a valid coupon being accepted; nothing tests the spec's case of an expired coupon being rejected.",
+        "failure_scenario": "The expiry logic is wrong as above -> the single test still passes.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against the spec: expired coupon rejected, including an active but expired coupon", "Tests: whether they cover the specified rejection path"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change with the findings; the author's confidence does not lower the bar, and approving or merging is not mine to do (the merge is the owner's gate)."
+  },
+  {
+    "id": "cr-004",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/billing/pay.js:55",
+        "what": "The mailer is given data.number, but the 'receipt' template renders data.invoiceNumber, so the receipt carries no invoice number.",
+        "failure_scenario": "An invoice is paid -> the customer receives a receipt with an empty invoice number, violating the spec.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "test/pay.test.js:12",
+        "what": "The test asserts the exact call the implementation makes with a mocked mailer, so it mirrors the code and would not fail if the data key is wrong for the template.",
+        "failure_scenario": "The key mismatch above -> the test still passes; no test renders the template and checks the invoice number appears.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against the spec: the receipt email includes the invoice number", "The contract between the call and the template's fields", "Tests: whether they would fail if the code were wrong"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change with both findings: align the data key with the template and add a test that checks the rendered receipt contains the invoice number."
+  },
+  {
+    "id": "cr-016",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/sales.js:25",
+        "what": "The read-check-write of remaining seats is not atomic, so concurrent sales can both pass the check and oversell the hall.",
+        "failure_scenario": "remaining is 1 and two buyers buy at the same moment -> both read 1, both pass the check, both write 0, and two tickets are sold for one seat.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/sales.js:27",
+        "what": "Tests cover only a single sequential sale; nothing tests concurrent purchases or the sold-out path.",
+        "failure_scenario": "The race above -> the single test (10 to 9) still passes.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against the spec, including the concurrent case it names", "Use of the database's available transactions or conditional updates", "Tests: concurrency and failure paths"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change with the findings: use a conditional update or a transaction so the decrement only happens when remaining is at least 1, and add a concurrent-sale test."
+  },
+  {
+    "id": "cr-001",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/api/list.js:14",
+        "what": "The upper-bound check is `size > 101`, so pageSize 101 is accepted, contradicting criterion 2 (above 100 answers 400).",
+        "failure_scenario": "A request with pageSize=101 -> the list is returned instead of 400.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/api/list.js:12",
+        "what": "Tests check only 20 and 0; no test covers the boundary at 100 and 101 that criterion 2 specifies.",
+        "failure_scenario": "The off-by-one above -> all current tests still pass.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against criterion 2 at the limit (100, 101)", "Default and lower bound", "Tests: whether they cover the specified boundary"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change with the off-by-one finding and ask for boundary tests at 100 (accepted) and 101 (400)."
+  },
+  {
+    "id": "cr-014",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/refunds.js:8",
+        "what": "The 90-day window matches spec criterion 3 but contradicts the owner's recorded decision dl-021 (30 days), so the spec itself appears wrong.",
+        "failure_scenario": "A refund requested on day 45 -> accepted by the code, although the owner decided refunds are allowed only up to 30 days.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against spec criterion 3", "Consistency of the spec with recorded decisions (dl-021)", "Tests: day 89 and day 91 boundary"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": true,
+    "escalate_reason": "The spec contradicts the owner's recorded decision dl-021 (30 vs 90 days); which one holds is the owner's decision, not the implementer's or the reviewer's.",
+    "actions_now": "Hold the change and escalate the spec-versus-dl-021 conflict to the owner; once the owner settles the window, the implementer aligns the code and tests with it."
+  },
+  {
+    "id": "cr-005",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/routes/reports.js:88",
+        "what": "The delete route has no requireRole('manager') guard, unlike every other route in the file, so anyone who can reach the API can delete reports.",
+        "failure_scenario": "A non-manager (or any authenticated user) sends DELETE /reports/42 -> the report is deleted and 204 returned.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/routes/reports.js:88",
+        "what": "Only the manager happy path is tested; there is no negative test for a non-manager or unauthenticated delete.",
+        "failure_scenario": "The missing guard above -> the existing test still passes.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against the spec: only managers can delete", "Authorization at the new entry point, compared with the file's existing pattern", "Tests: negative authorization paths"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": true,
+    "escalate_reason": "A security defect: an unauthorized deletion path on a data-destroying route.",
+    "actions_now": "Return the change with the findings (add requireRole('manager') and a negative test) and escalate the authorization defect to the owner."
+  },
+  {
+    "id": "cr-002",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/db/orders.js:31",
+        "what": "User input from req.query.name is interpolated into the SQL string, an SQL injection.",
+        "failure_scenario": "A request with name = \"' OR '1'='1\" (or a UNION/DROP payload) -> the query returns all orders or runs attacker-chosen SQL.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/db/orders.js:30",
+        "what": "The only test searches a benign name; there is no test with quotes or special characters in the input.",
+        "failure_scenario": "A search for \"O'Brien\" -> the query breaks with a syntax error, and no test catches it.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against the spec: search by customer name", "Security: input validation and injection at the route-to-query path", "Tests: malicious and edge-case input"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": true,
+    "escalate_reason": "A security defect: SQL injection reachable from a public query parameter.",
+    "actions_now": "Return the change with the findings (use a parameterized query and test hostile input) and escalate the security defect to the owner."
+  },
+  {
+    "id": "cr-009",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "important",
+        "where": "src/api/cart.js:31",
+        "what": "The error message says 'qty must be positive', which is wrong since 0 is valid, and it does not match the expected 'qty must be non-negative', so the test fails.",
+        "failure_scenario": "A request with qty -1 -> 400 with 'qty must be positive', telling the user 0 is invalid; the message test fails.",
+        "status": "confirmed"
+      }
+    ],
+    "checked": ["Correctness against the spec: negative quantity gives 400, zero is valid", "The error message against the spec's semantics and the test", "Ran the tests"],
+    "ran": ["The cart tests: 1 pass (qty -1 gets 400), 1 fail (message expected 'qty must be non-negative', got 'qty must be positive')"],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change with the confirmed finding and the failing test output; I do not fix it on the branch myself, since the reviewer does not write code in the same task."
+  },
+  {
+    "id": "cr-015",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "important",
+        "where": "test/bookings.test.js",
+        "what": "Criterion 2 (an impossible date such as '2026-02-30' answers 400) has no test, so whether parseISO rejects it or rolls it over is unproven.",
+        "failure_scenario": "If parseISO normalizes '2026-02-30' to 2026-03-02 -> isValid is true, the booking is created instead of 400, and no test catches it.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Correctness against criteria 1 and 2", "Whether the date parser's behavior on impossible dates is established", "Tests: coverage of the failure path in criterion 2"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change and ask for tests for criterion 2 ('2026-02-30' and a malformed string get 400); the code may be correct, but it is unverified."
+  },
+  {
+    "id": "cr-006",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/checkout.js:23",
+        "what": "checkout has no empty-cart check, so the claimed and specified 400 'cart is empty' is never returned.",
+        "failure_scenario": "A cart with items: [] -> total is 0 and charge(customer, 0) runs instead of answering 400 'cart is empty'.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/checkout.js:23",
+        "what": "No test covers the empty cart that criterion 4 and the description name.",
+        "failure_scenario": "The missing check above -> no test fails.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["The description's claim checked against the code, not taken on trust", "Correctness against criterion 4 (empty cart)", "Tests: coverage of the empty-cart path"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Return the change: the description claims behavior the code does not have; ask for the empty-cart check and a test for it."
+  },
+  {
+    "id": "cr-012",
+    "verdict": "return",
+    "findings": [
+      {
+        "severity": "blocking",
+        "where": "src/releases/automation.js:41",
+        "what": "The deploy agent's script moves a release to 'published', a transition the binding reserves for the owner.",
+        "failure_scenario": "A release in 'ready' with all checks ok -> the agent publishes it without the owner's decision.",
+        "status": "plausible"
+      },
+      {
+        "severity": "important",
+        "where": "src/releases/automation.js:40",
+        "what": "The test asserts the forbidden behavior (agent publishes) instead of testing that the agent cannot perform the owner's transition.",
+        "failure_scenario": "The gate bypass above -> the test passes and rewards it.",
+        "status": "plausible"
+      }
+    ],
+    "checked": ["Human gates: whether an agent path performs a person's transition", "Conformance to the binding", "Tests: whether they test the specified behavior"],
+    "ran": [],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": true,
+    "escalate_reason": "The change lets an agent perform the owner's ready-to-published transition, contradicting the binding's human gate.",
+    "actions_now": "Return the change (the script may mark a release ready and notify the owner, never publish) and escalate the human-gate violation to the owner."
+  },
+  {
+    "id": "cr-003",
+    "verdict": "pass",
+    "findings": [],
+    "checked": ["Correctness against criteria 1 and 2 at the limits: 200 accepted, 201 rejected with 'title too long'", "Empty and non-string titles rejected", "Tests cover the boundary and the failure paths and would fail if the comparison were off by one"],
+    "ran": ["test/tasks.test.js: 3 pass, 0 fail"],
+    "fixes_code": false,
+    "approves_merge": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "actions_now": "Report no findings, say what was checked and run, and pass the change to the next gate."
+  }
+]

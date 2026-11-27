@@ -8,7 +8,9 @@ metadata:
 
 # Product Spec
 
-Draft: its evaluation set is designed, not yet run
+Draft: an evaluation baseline is recorded (at the ceiling; see
+[references/eval-set.md](references/eval-set.md)), but there is no consumer
+yet and no approval by the layer's owner
 ([skill-authoring](../skill-authoring/SKILL.md) `Done`).
 
 ## How to read this skill
