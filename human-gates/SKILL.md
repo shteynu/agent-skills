@@ -20,7 +20,9 @@ entry to the decision queue or the decision log; `Deferred decisions` — the ru
 is autonomous and a gate is reached with nobody present; `Rejection` — a
 person rejected an earlier decision. The record format is in
 [references/decision-record.md](references/decision-record.md), opened when
-writing to the decision log or queue.
+writing to the decision log or queue. The evaluation set is in
+[references/eval-set.md](references/eval-set.md), opened when this skill
+changes or an agent got a gate wrong in use.
 
 ## The rule
 
