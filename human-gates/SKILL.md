@@ -15,7 +15,8 @@ Always in force: `The rule` — it is the reason this skill exists;
 `Provisional is not verified` — it governs every report you write.
 
 Conditional: `Preparing a decision` — your step ends at a human gate;
-`Recording a decision` — a person has answered; `Deferred decisions` — the run
+`Recording a decision` — a person has answered; `Identifiers` — you add an
+entry to the decision queue or the decision log; `Deferred decisions` — the run
 is autonomous and a gate is reached with nobody present; `Rejection` — a
 person rejected an earlier decision. The record format is in
 [references/decision-record.md](references/decision-record.md), opened when
@@ -58,6 +59,25 @@ A decision is recorded in the decision log by the person or from their own
 words: who decided, when, which option, on what basis, and which units it
 applies to. The unit's transition then cites the log entry. An agent may
 transcribe a person's answer; it never infers one.
+
+## Identifiers
+
+Units, other entries and reports cite queue and log entries by id, so an id
+names one entry for good, across every branch of the repository.
+
+- Before taking an id, fetch, read the highest id in that file on every
+  branch that adds entries, local and pushed, parallel lines included, and
+  take the next one above all of them. The next free number in your own copy is not
+  enough: a parallel line may already hold it.
+- Where lines add entries at the same time, the binding may give each line
+  its own range or prefix instead; a line then takes ids only from its own.
+- An id is never reused, even after its entry is withdrawn.
+- Before two lines are merged, check that no id stands for different entries
+  on the two sides. The same entry on both sides, because one line took in
+  the other, is not a collision. A collision is fixed on the side that is not
+  yet in the main line, whichever way the merge runs: its entry takes a new
+  id, and every reference to it on that side changes in the same commit. An id already merged into the main line,
+  or cited from another line, is never renumbered.
 
 ## Deferred decisions
 
