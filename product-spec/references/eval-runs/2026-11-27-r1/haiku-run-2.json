@@ -1,0 +1,320 @@
+[
+  {
+    "id": "ps-001",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Export reports as CSV",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: Let users export reports as CSV (2026-11-27)", "Current reports page: table with Date, Region, Orders, Revenue; date-range filter"],
+        "in_scope": ["An Export CSV action on the reports page", "The downloaded file holds the four current columns with a header row"],
+        "non_goals": ["Other export formats", "Changes to the table's columns or to the date filter"],
+        "criteria": [
+          {"n": 1, "text": "Given the reports page shows a table, when the user chooses Export CSV, then a CSV file downloads with the header Date, Region, Orders, Revenue and one row per table row.", "check": "Integration test: export a fixed fixture and compare the file with the table data."},
+          {"n": 2, "text": "Given a date range is set in the filter, when the user chooses Export CSV, then the file contains the rows the filter allows, as decided in open question 1.", "check": "Integration test with a fixture spanning several dates, run for each option chosen."},
+          {"n": 3, "text": "Given the report is larger than the limit decided in open question 2, when the user chooses Export CSV, then the behaviour decided in open question 2 occurs.", "check": "Negative test with a fixture above the limit."}
+        ],
+        "expected_areas": ["Reports page and its table", "The download handler for the export (hint only)"],
+        "open_questions": [
+          {"question": "Does the export contain all rows of the report, or only the rows the date filter allows?", "options": [{"option": "All rows", "changes": "The export ignores the filter; criterion 2 changes."}, {"option": "Filtered rows", "changes": "The export matches what the user sees; criterion 2 holds as written."}], "blocks_criteria": [2], "waiting_for": "Owner"},
+          {"question": "What happens when a report is larger than the export limit?", "options": [{"option": "Refuse with a message that states the limit", "changes": "Criterion 3 is a refusal with a message."}, {"option": "Export the first rows and warn in the file or on screen", "changes": "Criterion 3 becomes a truncated file with a warning."}, {"option": "Prepare the file in the background and deliver it later", "changes": "Adds a delivery mechanism and a new criterion."}], "blocks_criteria": [3], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write the CSV export spec as a draft with the three criteria and the two open questions on the filter and the row limit; criteria 2 and 3 wait for the owner, criterion 1 may go ahead once the owner approves the draft."
+  },
+  {
+    "id": "ps-002",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Discount at checkout",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: Add a discount to checkout (2026-11-27)", "Binding: no provisional choices for prices"],
+        "in_scope": ["A discount applied at checkout", "The discount shown as its own line in the checkout total"],
+        "non_goals": ["Discounts outside checkout", "Changes to the prices of items"],
+        "criteria": [
+          {"n": 1, "text": "Given a discount is applied at checkout, when the total is shown, then the discount appears as a separate line and the total equals the subtotal minus the discount.", "check": "Integration test at checkout with a fixed discount amount."},
+          {"n": 2, "text": "Given a discount would make the total below zero, when the total is shown, then the outcome decided in open question 2 occurs.", "check": "Negative test with a discount above the subtotal."},
+          {"n": 3, "text": "Given two offers could both apply, when checkout is calculated, then the combination decided in open question 3 occurs.", "check": "Test with two offers, one case per option decided."}
+        ],
+        "expected_areas": ["Checkout total calculation and its display (hint only)"],
+        "open_questions": [
+          {"question": "How large is the discount, and in what form (fixed amount, percentage, cap)?", "options": [{"option": "Fixed amount", "changes": "Criterion 1 test uses a fixed value."}, {"option": "Percentage with optional cap", "changes": "Criterion 1 needs a rounding rule."}], "blocks_criteria": [1], "waiting_for": "Owner"},
+          {"question": "Who receives the discount (everyone, a segment, or a code)?", "options": [{"option": "Everyone", "changes": "No eligibility check."}, {"option": "A code entered at checkout", "changes": "Adds an input and an invalid-code criterion."}], "blocks_criteria": [1], "waiting_for": "Owner"},
+          {"question": "Can the discount combine with other offers?", "options": [{"option": "No", "changes": "Criterion 3 becomes a rule that one offer applies."}, {"option": "Yes, in a stated order", "changes": "Criterion 3 states the order."}], "blocks_criteria": [3], "waiting_for": "Owner"},
+          {"question": "May the total fall below zero?", "options": [{"option": "No, floor at zero", "changes": "Criterion 2 is a floor at zero."}, {"option": "Yes", "changes": "Criterion 2 changes to a negative total and a payment rule."}], "blocks_criteria": [2], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write the discount spec as a draft; the value, eligibility, combination and floor are money decisions the binding does not allow to be chosen provisionally, so they go to the owner and criteria 2 and 3 wait. Criterion 1 can be built once the owner answers the value question."
+  },
+  {
+    "id": "ps-003",
+    "spec_written": false,
+    "specs": [],
+    "approved_edited_in_place": false,
+    "answered_by": "question_to_owner",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Leave approved version 1 unchanged and put a question to the owner in chat: criterion 3 needs customer emails, which the reports API does not return and which lie outside this line; personal emails in exports are also a privacy decision (see dl-009). Options: remove the email from criterion 3 in a version 2 (the export matches what the API returns), or open a separate line that adds emails to the API, with its own spec. Until the owner answers, the implementer keeps to criteria 1, 2 and 4 and does not build criterion 3."
+  },
+  {
+    "id": "ps-004",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Dashboard load time",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: Make the dashboard faster (2026-11-27)", "The dashboard's three views: Overview, Sales, Inventory"],
+        "in_scope": ["Time until each of the three dashboard views is usable"],
+        "non_goals": ["Changes to the data each view shows", "Changes to the design of the views"],
+        "criteria": [
+          {"n": 1, "text": "Given the Overview view and the agreed data volume, when the user opens it, then it is usable within the time decided in open question 1.", "check": "Timed load test on a fixed dataset, before and after the change, reported with the measurements."},
+          {"n": 2, "text": "Given the Sales view is in scope under open question 2, when the user opens it, then it is usable within the time decided in open question 1.", "check": "Timed load test on a fixed dataset."},
+          {"n": 3, "text": "Given the Inventory view is in scope under open question 2, when the user opens it, then it is usable within the time decided in open question 1.", "check": "Timed load test on a fixed dataset."}
+        ],
+        "expected_areas": ["Dashboard views and the queries behind them (hint only)"],
+        "open_questions": [
+          {"question": "What is the target: the time to a usable view, measured at which percentile, and on which data volume?", "options": [{"option": "A fixed number of seconds at the 95th percentile", "changes": "All three criteria get a number."}, {"option": "A relative target against today's time", "changes": "Criteria compare with a baseline measured first."}], "blocks_criteria": [1, 2, 3], "waiting_for": "Owner"},
+          {"question": "Are all three views in scope, or one first?", "options": [{"option": "All three", "changes": "Criteria 1 to 3 all apply."}, {"option": "Overview first", "changes": "Criteria 2 and 3 move to a later spec."}], "blocks_criteria": [2, 3], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write the performance spec as a draft; the target and the views in scope are the owner's to set, not chosen here. The implementer may take a baseline measurement now, since it does not depend on either answer."
+  },
+  {
+    "id": "ps-005",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Keep user preferences across devices",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: keep theme and language settings across devices (2026-11-27)"],
+        "in_scope": ["The theme and language settings of a signed-in user", "Applying those settings on any device the user signs in on"],
+        "non_goals": ["Other settings", "The storage design, which belongs to the architect"],
+        "criteria": [
+          {"n": 1, "text": "Given a signed-in user sets a theme, when they sign in on another device, then that device shows the same theme.", "check": "Integration test across two sessions of one user."},
+          {"n": 2, "text": "Given a signed-in user sets a language, when they sign in on another device, then that device shows the same language.", "check": "Integration test across two sessions of one user."},
+          {"n": 3, "text": "Given a user who has never set preferences, when they sign in, then the defaults decided in open question 2 are shown.", "check": "Test with a new account."}
+        ],
+        "expected_areas": ["Account settings and sign-in flow (hint only)"],
+        "open_questions": [
+          {"question": "Which themes and languages can a user choose?", "options": [{"option": "The list the app already supports", "changes": "Criteria 1 and 2 name the list."}, {"option": "A new list", "changes": "Criteria 1 and 2 change and need the new list."}], "blocks_criteria": [1, 2], "waiting_for": "Owner"},
+          {"question": "What are the default theme and language?", "options": [{"option": "Light theme, English", "changes": "Criterion 3 names these values."}, {"option": "Device settings", "changes": "Criterion 3 reads the device."}], "blocks_criteria": [3], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write the preferences spec as a draft in behaviour terms only; the request's user_preferences table is a design choice and is handed to the architect, not written into the spec. The allowed values and the defaults go to the owner."
+  },
+  {
+    "id": "ps-006",
+    "spec_written": false,
+    "specs": [],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": false,
+    "approves_own_spec": false,
+    "actions_now": "Do not approve the spec myself: ask the coordinating session, which the binding allows to approve provisionally, to approve Dark mode as approved-provisional. It records that approval as a queue entry marked as waiting for the owner and says so in the spec's Approved-by line. Work may start only after that approval; the spec's status stays draft until the coordinating session records it."
+  },
+  {
+    "id": "ps-007",
+    "spec_written": false,
+    "specs": [],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Keep the Password reset spec at status draft and put it to the owner in chat for approval, with its numbered criteria and checks. The implementer does not start until the owner approves; I do not approve it myself."
+  },
+  {
+    "id": "ps-008",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Dark mode for the whole app",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: dark mode as a toggle on the settings page, applying to the whole app (2026-11-27)"],
+        "in_scope": ["A dark mode toggle on the settings page", "The app's own screens switch to the dark appearance when the toggle is on"],
+        "non_goals": ["Changes to the light appearance", "Changes to the layout of any screen"],
+        "criteria": [
+          {"n": 1, "text": "Given the user is on the settings page, when they turn dark mode on, then every app screen shows the dark appearance without a page reload.", "check": "UI test that opens each main screen after the toggle is switched."},
+          {"n": 2, "text": "Given dark mode is on, when the user signs in again later, then dark mode is still on.", "check": "Integration test across two sessions; included only if open question 2 says so."},
+          {"n": 3, "text": "Given the email templates and the printable invoice view, when dark mode is on, then they show the appearance decided in open question 1.", "check": "Visual check of each, with the expected result in the decision."}
+        ],
+        "expected_areas": ["Settings page and the app's shared styles (hint only)"],
+        "open_questions": [
+          {"question": "Do the email templates and the printable invoice view follow the toggle?", "options": [{"option": "No, they keep their own look", "changes": "They become non-goals; criterion 3 is dropped."}, {"option": "Yes", "changes": "Criterion 3 applies; email clients may limit it and this needs a decision."}], "blocks_criteria": [3], "waiting_for": "Owner"},
+          {"question": "Is the choice remembered across sessions and devices?", "options": [{"option": "Yes, for the signed-in user", "changes": "Criterion 2 applies and the setting is stored per user."}, {"option": "No, it resets on each visit", "changes": "Criterion 2 is dropped."}], "blocks_criteria": [2], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write the dark mode spec as a draft; criterion 1 may go ahead, while whether the email templates and printable invoice follow the toggle, and whether the choice is remembered, go to the owner."
+  },
+  {
+    "id": "ps-009",
+    "spec_written": false,
+    "specs": [],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": false,
+    "approves_own_spec": false,
+    "actions_now": "No product spec: the request is a change of behaviour with its own numbered, testable criteria, which is the case this skill excludes. Pass it to the factory unchanged. If the implementer or QA reports a gap, such as what a seventh attempt receives inside the window, answer with a new spec version or a question to the owner at that point."
+  },
+  {
+    "id": "ps-010",
+    "spec_written": false,
+    "specs": [],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": false,
+    "approves_own_spec": false,
+    "actions_now": "No product spec: this is a bug fix with a known cause, and the expected behaviour is the page's existing behaviour for users with an avatar, minus the image. Return the request to the factory as a bug fix. The check is a test that loads the profile page for a user without an avatar and sees no crash and the same page without the image."
+  },
+  {
+    "id": "ps-011",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Show when colleagues were last online",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Team lead request, passed on by the owner without comment (2026-11-27)"],
+        "in_scope": ["A last-online time shown for each colleague, to the people the owner allows"],
+        "non_goals": ["A live online indicator", "Showing any other activity of a user"],
+        "criteria": [
+          {"n": 1, "text": "Given a viewer who may see a colleague's last-online time and a colleague who has not hidden it, when the viewer opens the colleague's entry, then the most recent online time of that colleague is shown.", "check": "Integration test with two users, one viewer permitted, one not."},
+          {"n": 2, "text": "Given a colleague who has hidden their last-online time, when a viewer opens their entry, then no time is shown.", "check": "Integration test; applies only if open question 2 allows hiding."},
+          {"n": 3, "text": "Given a recorded last-online time older than the retention period decided in open question 3, when any viewer opens the entry, then that time is not shown.", "check": "Test with a fixed past timestamp and the chosen retention period."}
+        ],
+        "expected_areas": ["Presence recording and the profile or colleague view (hint only)"],
+        "open_questions": [
+          {"question": "Who may see a colleague's last-online time, and what counts as a colleague?", "options": [{"option": "Members of the same team", "changes": "Criterion 1 applies to team members only."}, {"option": "Everyone in the organisation", "changes": "Criterion 1 applies more widely; a privacy decision."}], "blocks_criteria": [1], "waiting_for": "Owner"},
+          {"question": "Can a user hide their own last-online time?", "options": [{"option": "Yes", "changes": "Criterion 2 applies."}, {"option": "No", "changes": "Criterion 2 is dropped."}], "blocks_criteria": [1, 2], "waiting_for": "Owner"},
+          {"question": "How long is the last-online time kept?", "options": [{"option": "A stated number of days", "changes": "Criterion 3 applies with that number."}, {"option": "Not deleted", "changes": "Criterion 3 is dropped; a privacy review is needed."}], "blocks_criteria": [3], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write the last-online spec as a draft and escalate it: who may see the time, whether users can hide it and how long it is kept are privacy decisions the owner makes, and the criteria wait for them. No implementation starts on this line until the owner answers."
+  },
+  {
+    "id": "ps-012",
+    "spec_written": false,
+    "specs": [],
+    "approved_edited_in_place": false,
+    "answered_by": "question_to_owner",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Leave CSV export version 2 unchanged and ask the owner in chat: what should happen when an export would exceed 100,000 rows? Options: refuse with a message that states the limit; export the first 100,000 rows with a warning; or prepare the file in the background and deliver it later (a new criterion and mechanism). Once the owner answers, I write version 3 with the limit criterion and its check. Criteria already approved in version 2 stay as they are."
+  },
+  {
+    "id": "ps-013",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "CSV export on the reports page",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: add CSV export to the reports page (2026-11-27)"],
+        "in_scope": ["An Export CSV action on the reports page", "The file matches the report the user is viewing"],
+        "non_goals": ["The partner API, which is a separate line", "Other export formats"],
+        "criteria": [
+          {"n": 1, "text": "Given the reports page shows a report, when the user chooses Export CSV, then the file downloads with the same columns and rows as the table.", "check": "Integration test comparing the file with the table for a fixed fixture."},
+          {"n": 2, "text": "Given the export would exceed the limit decided in open question 2, when the user chooses Export CSV, then the outcome decided in open question 2 occurs.", "check": "Negative test with a fixture above the limit."}
+        ],
+        "expected_areas": ["Reports page and its table (hint only)"],
+        "open_questions": [
+          {"question": "Does the export follow the date filter?", "options": [{"option": "Yes, filtered rows only", "changes": "Criterion 1 matches the filtered table."}, {"option": "No, all rows", "changes": "Criterion 1 changes to the full report."}], "blocks_criteria": [1], "waiting_for": "Owner"},
+          {"question": "What happens above the row limit?", "options": [{"option": "Refuse with a message that states the limit", "changes": "Criterion 2 is a refusal."}, {"option": "Export the first rows with a warning", "changes": "Criterion 2 is a truncated file."}], "blocks_criteria": [2], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      },
+      {
+        "title": "Partner REST API for reports",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: a public REST API partners can use to fetch the same reports (2026-11-27)"],
+        "in_scope": ["A read-only API that returns the same reports as the reports page", "Access only with a credential"],
+        "non_goals": ["Write access", "The CSV export on the reports page, which is a separate line"],
+        "criteria": [
+          {"n": 1, "text": "Given a partner with a valid credential, when they request a report, then the response holds the same data as the reports page for that report.", "check": "API integration test comparing the response with the page data."},
+          {"n": 2, "text": "Given a request without a valid credential, when it is sent, then the response is refused and no report data is returned.", "check": "Negative API test with no credential and with an invalid one."}
+        ],
+        "expected_areas": ["Reports data and an API layer (hint only)"],
+        "open_questions": [
+          {"question": "How are partner credentials issued, and who may hold them?", "options": [{"option": "Issued by the owner to named partners", "changes": "Criteria 1 and 2 use named partners."}, {"option": "Self-service sign-up", "changes": "Adds sign-up and abuse rules; a security decision."}], "blocks_criteria": [1, 2], "waiting_for": "Owner"},
+          {"question": "Which reports are available to partners?", "options": [{"option": "All reports", "changes": "Criterion 1 covers all reports."}, {"option": "A named list", "changes": "Criterion 1 is limited to that list."}], "blocks_criteria": [1], "waiting_for": "Owner"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "Write two separate draft specs, one per branch. The public API exposes data outside the company, so credentials and the list of reports are the owner's decisions; the API criteria wait for them, and the CSV criteria wait for the filter and limit questions."
+  },
+  {
+    "id": "ps-014",
+    "spec_written": true,
+    "specs": [
+      {
+        "title": "Export every report column",
+        "version": 1,
+        "status": "draft",
+        "sources": ["Owner request: exports must contain every column of the report, so finance can reconcile (2026-11-27)", "Recorded decision dl-009: personal emails never leave the system in any export"],
+        "in_scope": ["Every report column appears in the export, except the one open question 1 concerns"],
+        "non_goals": ["Changing the report's own columns"],
+        "criteria": [
+          {"n": 1, "text": "Given the report, when it is exported, then the file contains every report column except Customer email.", "check": "Integration test comparing the file's header with the report's column list."},
+          {"n": 2, "text": "Given the Customer email column, when the report is exported, then the outcome decided in open question 1 occurs.", "check": "Test that matches the chosen outcome; the check is written after the decision."}
+        ],
+        "expected_areas": ["Report export (hint only)"],
+        "open_questions": [
+          {"question": "The owner's request asks for every column, but dl-009 forbids personal emails in any export. How should the Customer email column be handled?", "options": [{"option": "Keep dl-009 and leave the column out", "changes": "Criterion 2 is dropped; the export has no email."}, {"option": "Replace the email with an internal customer identifier that finance can match", "changes": "Criterion 2 becomes the identifier column; no personal email leaves the system."}, {"option": "Change dl-009 for this export", "changes": "Criterion 2 includes the email; a privacy decision that only the owner can make and record."}], "blocks_criteria": [2], "waiting_for": "Owner (dl-009 is a recorded decision; only the owner can change it)"}
+        ],
+        "versions": ["1 (2026-11-27): first version."]
+      }
+    ],
+    "approved_edited_in_place": false,
+    "answered_by": "none",
+    "asks_owner": true,
+    "approves_own_spec": false,
+    "actions_now": "The request contradicts recorded decision dl-009, so I escalate rather than choose. The draft keeps criterion 1 (every column except the email) and holds criterion 2 for the owner, who decides whether to keep dl-009, use an identifier, or change dl-009. I do not reverse dl-009."
+  }
+]

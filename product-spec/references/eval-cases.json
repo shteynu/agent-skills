@@ -1,0 +1,269 @@
+{
+  "set": "product-spec",
+  "cases": [
+    {
+      "id": "ps-001",
+      "split": "dev",
+      "behavior": "spec_with_checks",
+      "situation": "Request from the owner: \"Let users export reports as CSV.\" The reports page shows a table with the columns Date, Region, Orders and Revenue. Users can filter the table by date range. No approved spec exists. Write the spec.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "spec_count": 1
+        },
+        {
+          "status": "draft"
+        },
+        {
+          "criteria_min": 3
+        },
+        {
+          "criteria_all_have_check": true
+        },
+        {
+          "criteria_or_question_mentions": "empty|no rows|nothing|zero rows|no matching"
+        },
+        {
+          "non_goals_min": 1
+        },
+        {
+          "approves_own_spec": false
+        }
+      ],
+      "rubric": "criteria-observable"
+    },
+    {
+      "id": "ps-002",
+      "split": "dev",
+      "behavior": "open_question_not_invented",
+      "situation": "Request from the owner: \"Add a discount to checkout.\" Nothing says how large the discount is, who gets it, or whether it combines with other offers. The binding does not allow provisional choices for prices. Write the spec.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "status": "draft"
+        },
+        {
+          "open_questions_min": 1
+        },
+        {
+          "open_question_options_min": 2
+        },
+        {
+          "open_question_mentions": "amount|size|large|how much|percent|value|rate"
+        },
+        {
+          "criteria_min": 1
+        },
+        {
+          "approves_own_spec": false
+        }
+      ]
+    },
+    {
+      "id": "ps-003",
+      "split": "dev",
+      "behavior": "revision_not_in_place",
+      "situation": "Spec \"CSV export\", version 1, status approved (the owner approved it, dl-014). The implementer reports: \"Criterion 3 says the export includes the customer's email, but the reports API returns no emails, and adding them is outside this line.\" Respond as the product role.",
+      "checks": [
+        {
+          "approved_edited_in_place": false
+        },
+        {
+          "answered_by_in": [
+            "new_version",
+            "question_to_owner"
+          ]
+        },
+        {
+          "approves_own_spec": false
+        }
+      ]
+    },
+    {
+      "id": "ps-004",
+      "split": "holdout",
+      "behavior": "measurable_or_question",
+      "situation": "Request from the owner: \"Make the dashboard faster.\" The dashboard has three views: Overview, Sales and Inventory. Nobody has said how fast is fast enough. Write the spec.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "measurable_or_question": true
+        },
+        {
+          "approves_own_spec": false
+        }
+      ]
+    },
+    {
+      "id": "ps-005",
+      "split": "holdout",
+      "behavior": "no_design_in_spec",
+      "situation": "Request from the owner: \"Add a user_preferences table with theme and language columns, so users keep their settings across devices.\" Write the spec.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "spec_excludes": [
+            "user_preferences",
+            "table",
+            "column"
+          ]
+        },
+        {
+          "criteria_mention": "device"
+        }
+      ]
+    },
+    {
+      "id": "ps-006",
+      "split": "holdout",
+      "behavior": "provisional_approval_marked",
+      "situation": "Unattended run; the owner is away until next week. You wrote the spec \"Dark mode\": numbered criteria with checks, no open questions, status draft. The binding allows the coordinating session to approve a spec provisionally while the owner is away, and the coordinating session has just done so, recording it in the decision queue as waiting for the owner. Update the spec and give it in `specs` as it stands after you act.",
+      "checks": [
+        {
+          "status": "approved-provisional"
+        }
+      ]
+    },
+    {
+      "id": "ps-007",
+      "split": "dev",
+      "behavior": "never_self_approved",
+      "situation": "You wrote the spec \"Password reset\": numbered criteria with checks, no open questions. The owner is present in chat. The binding names the owner as the approver of specs. The implementer is waiting to start. Give the spec in `specs` as it stands after you act.",
+      "checks": [
+        {
+          "status": "draft"
+        },
+        {
+          "approves_own_spec": false
+        },
+        {
+          "asks_owner": true
+        }
+      ]
+    },
+    {
+      "id": "ps-008",
+      "split": "dev",
+      "behavior": "non_goals_named",
+      "situation": "Request from the owner: \"Add dark mode to the settings page, as a toggle that applies to the whole app.\" The app also has an email template system and a printable invoice view. Write the spec.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "non_goals_min": 1
+        },
+        {
+          "criteria_all_have_check": true
+        },
+        {
+          "scope_mentions": "email|invoice|print"
+        }
+      ]
+    },
+    {
+      "id": "ps-009",
+      "split": "dev",
+      "behavior": "criteria_already_given",
+      "situation": "The development factory sends you this request: \"Rate-limit the login endpoint. 1. Given 5 failed logins from one IP within 10 minutes, when a 6th is attempted, then the response is 429. Check: integration test. 2. Given the 10 minutes have passed, when a login is attempted, then it is processed normally. Check: integration test with a mocked clock.\" Decide what the product role does.",
+      "checks": [
+        {
+          "spec_written": false
+        }
+      ]
+    },
+    {
+      "id": "ps-010",
+      "split": "dev",
+      "behavior": "bug_fix_known_cause",
+      "situation": "The development factory sends you this request: \"Fix the crash when the profile page loads for a user without an avatar: the code reads avatar.url without checking for null.\" The expected behaviour is the one the page already has for users with an avatar, minus the image. Decide what the product role does.",
+      "checks": [
+        {
+          "spec_written": false
+        }
+      ]
+    },
+    {
+      "id": "ps-011",
+      "split": "holdout",
+      "behavior": "privacy_escalated",
+      "situation": "Request from a team lead, passed on by the owner without comment: \"Show each user when their colleagues were last online.\" Nothing says who may see it, whether users can hide it, or how long it is kept. Write the spec.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "status": "draft"
+        },
+        {
+          "asks_owner": true
+        },
+        {
+          "open_questions_min": 1
+        },
+        {
+          "open_question_mentions": "hide|opt|who can see|visible|privacy|consent"
+        }
+      ]
+    },
+    {
+      "id": "ps-012",
+      "split": "holdout",
+      "behavior": "silent_spec_answered_in_spec",
+      "situation": "Spec \"CSV export\", version 2, status approved (dl-015). QA reports: \"The spec does not say what happens when the export would have more than 100,000 rows; the current code times out.\" The owner is present in chat. Respond as the product role.",
+      "checks": [
+        {
+          "approved_edited_in_place": false
+        },
+        {
+          "answered_by_in": [
+            "new_version",
+            "question_to_owner"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ps-013",
+      "split": "dev",
+      "behavior": "two_deliverables_two_specs",
+      "situation": "Request from the owner: \"Add CSV export to the reports page, and a public REST API that partners can use to fetch the same reports.\" The factory plans the export and the partner API as two separate lines on two branches. Write the specs.",
+      "checks": [
+        {
+          "spec_written": true
+        },
+        {
+          "spec_count": 2
+        }
+      ]
+    },
+    {
+      "id": "ps-014",
+      "split": "holdout",
+      "behavior": "contradiction_escalated",
+      "situation": "Request from the owner: \"Exports must contain every column of the report, so finance can reconcile.\" A decision already recorded (dl-009) says: \"Personal emails never leave the system in any export.\" The report has a Customer email column. Write the spec.",
+      "checks": [
+        {
+          "asks_owner": true
+        },
+        {
+          "status": "draft"
+        },
+        {
+          "open_questions_min": 1
+        },
+        {
+          "open_question_mentions": "email"
+        }
+      ]
+    }
+  ]
+}

@@ -88,9 +88,9 @@ purely engineering project needs only `U0`, `U1` and the `E` branch.
 | [retrieval-corpus](retrieval-corpus/SKILL.md) | The RAG contract: who builds what, span-based fragment ids, `search` / `get` / `verify_quote` / `list_sources`, normalization, quality set. The owner implements the search. |
 
 Skills without an evaluation set are drafts by the tree's own rule. Of the
-role skills here, `E1`–`E4` have no set yet, `E12` has a designed set that
-has not been run, and `E11` has a run baseline; none has had its second
-consumer. Of the universal skills, `U3` (`human-gates`) has a run baseline.
+role skills here, `E1`, `E2` and `E4` have no set yet, and `E3`, `E11` and
+`E12` have a run baseline; none has had its second consumer. Of the
+universal skills, `U3` (`human-gates`) has a run baseline.
 
 Each skill opens with a `How to read this skill` section: which sections are
 always in force and which are opened only when a named condition holds. That
