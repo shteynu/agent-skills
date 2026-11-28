@@ -1,0 +1,965 @@
+[
+  {
+    "id": "qa-001",
+    "tests": [
+      {
+        "name": "rule 1 boundary: a link used at 29 min 59 s after issue resets the password",
+        "rule": "criterion 1 (link younger than 30 minutes changes the password), at its upper boundary",
+        "kind": "positive",
+        "setup": "Fixed clock at T. Create a user and issue a reset link at T. Advance the fake clock to T+29m59s. No real waiting.",
+        "action": "POST the reset API with the link and a new password.",
+        "expected": "Answer is success; logging in with the new password works and the old one fails."
+      },
+      {
+        "name": "rule 2 boundary: a link used at exactly 30 min after issue is refused with 410",
+        "rule": "criterion 2 (link issued 30 minutes ago or more answers 410 and leaves the password unchanged), at the boundary",
+        "kind": "negative",
+        "setup": "Fixed clock at T. Issue a reset link at T and advance the fake clock to T+30m00s.",
+        "action": "POST the reset API with the link and a new password.",
+        "expected": "API answers 410; the old password still works and the new one does not."
+      },
+      {
+        "name": "rule 2: a link used 30 min 1 s after issue is refused with 410 and changes nothing",
+        "rule": "criterion 2 (expired link answers 410, password unchanged)",
+        "kind": "negative",
+        "setup": "Fixed clock. Issue a reset link at T and advance to T+30m01s.",
+        "action": "POST the reset API with the link and a new password.",
+        "expected": "API answers 410; password unchanged."
+      },
+      {
+        "name": "rule 3: a link already used once is refused with 410 on second use",
+        "rule": "criterion 3 (already used link answers 410)",
+        "kind": "negative",
+        "setup": "Fixed clock. Issue a link at T; use it at T+1m to set password P1 successfully.",
+        "action": "At T+2m POST the same link with password P2.",
+        "expected": "API answers 410; the password stays P1, and P2 is not accepted."
+      },
+      {
+        "name": "rule 4: a token the server never issued is refused with 404 and changes nothing",
+        "rule": "criterion 4 (token never issued answers 404)",
+        "kind": "negative",
+        "setup": "Create a user with password P1. Build a well-formed token that the server never issued.",
+        "action": "POST the reset API with that token and password P2.",
+        "expected": "API answers 404; P1 still works and P2 does not."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on whether a successful reset invalidates the other outstanding reset links for the same account.",
+      "Spec is silent on the response for a malformed token (not in the expected format), as distinct from a well-formed token the server never issued."
+    ],
+    "defects": [],
+    "covered": [
+      "criterion 1 at its 29m59s boundary (the implementer's test covers the basic case)",
+      "criterion 2 at 30m00s and 30m01s, password unchanged",
+      "criterion 3 second use refused with 410",
+      "criterion 4 unknown token refused with 404, nothing changed"
+    ],
+    "not_covered": [
+      "outstanding links after a successful reset (spec silent)",
+      "malformed token status code (spec silent)",
+      "concurrent use of one link by two requests",
+      "implementation behaviour: src/auth/reset.js was not read, so no defect is claimed"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Add the boundary and negative tests for criteria 1 to 4, using an injected clock; keep the implementer's criterion 1 test. Send the two spec gaps to the spec owner; no test freezes them."
+  },
+  {
+    "id": "qa-005",
+    "tests": [
+      {
+        "name": "a ticket labelled urgent by the classifier is routed to the on-call queue",
+        "rule": "a ticket labelled urgent is routed to the on-call queue",
+        "kind": "positive",
+        "setup": "Replace classify(text) in src/llm/client.js with a stub behind the same one-function interface that returns the label urgent for a fixed ticket text.",
+        "action": "Submit the ticket to the service.",
+        "expected": "The ticket is placed in the on-call queue exactly once."
+      },
+      {
+        "name": "a ticket labelled non-urgent is not routed to the on-call queue",
+        "rule": "a ticket labelled urgent is routed to the on-call queue (negative control: only urgent tickets go there)",
+        "kind": "negative",
+        "setup": "Stub classify(text) to return the label normal for a fixed ticket text.",
+        "action": "Submit the ticket to the service.",
+        "expected": "The ticket is not in the on-call queue."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on what happens when classify throws or times out for a ticket.",
+      "Spec is silent on what happens when classify returns a label outside the known set, and on whether label matching is case-sensitive."
+    ],
+    "defects": [],
+    "covered": [
+      "routing of an urgent label to the on-call queue, with a stubbed classifier",
+      "non-urgent label does not reach the on-call queue"
+    ],
+    "not_covered": [
+      "whether the real model labels urgent tickets as urgent (accuracy belongs to agent-evals)",
+      "classifier failure and unknown-label handling (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Replace the live-model tests with stubs behind the same classify interface, so they are deterministic and offline, and add the urgent and non-urgent routing tests. Model accuracy is reported as not covered and left for agent-evals."
+  },
+  {
+    "id": "qa-011",
+    "tests": [
+      {
+        "name": "provisional stays provisional: a unit built on dq-7 carries the flag after the draft step",
+        "rule": "provisional stays provisional (a unit downstream of a provisional decision carries the flag through every step)",
+        "kind": "property",
+        "setup": "Record decision dq-7 as provisional. Build a unit that depends on dq-7.",
+        "action": "Run the draft step on the unit.",
+        "expected": "The draft output's flags field includes the provisional flag for dq-7."
+      },
+      {
+        "name": "provisional stays provisional: the flag survives the check step",
+        "rule": "provisional stays provisional (through every step)",
+        "kind": "property",
+        "setup": "The draft output from the previous test.",
+        "action": "Run the check step on the draft output.",
+        "expected": "The check output's flags field still includes the provisional flag for dq-7."
+      },
+      {
+        "name": "provisional stays provisional: the flag reaches the bundle",
+        "rule": "provisional stays provisional (through every step)",
+        "kind": "property",
+        "setup": "The check output from the previous test.",
+        "action": "Run the bundle step.",
+        "expected": "The bundled unit's flags field includes the provisional flag for dq-7."
+      },
+      {
+        "name": "a unit not built on dq-7 carries no provisional flag",
+        "rule": "provisional stays provisional (negative control: the flag is not added to units without the dependency)",
+        "kind": "negative",
+        "setup": "Build a unit that does not depend on dq-7.",
+        "action": "Run draft, check and bundle on it.",
+        "expected": "Its flags field has no provisional flag at any step."
+      },
+      {
+        "name": "a re-run of a step keeps the provisional flag",
+        "rule": "provisional stays provisional (through every step)",
+        "kind": "property",
+        "setup": "A unit built on dq-7 that has been drafted once.",
+        "action": "Run the draft step a second time.",
+        "expected": "The new draft output still carries the provisional flag."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on the exact value and shape of the flags field, and on whether a flag is removed when dq-7 is later confirmed.",
+      "Spec is silent on the case where a unit depends on both a provisional and a confirmed decision."
+    ],
+    "defects": [],
+    "covered": [
+      "flag propagation through draft, check and bundle for a unit built on dq-7",
+      "no flag on an unrelated unit",
+      "flag kept on a re-run"
+    ],
+    "not_covered": [
+      "what happens when dq-7 is confirmed (spec silent)",
+      "units with mixed provisional and confirmed dependencies (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write the propagation property tests for the three steps, plus the negative control and the re-run test, using stubbed step inputs. Report the confirmation case as a spec finding."
+  },
+  {
+    "id": "qa-004",
+    "tests": [
+      {
+        "name": "session expires after 15 minutes",
+        "rule": "a session is valid before 15 minutes and expired at 15 minutes after creation",
+        "kind": "positive",
+        "setup": "Replace the real clock and setTimeout with an injected fake clock. Create a session at fake time T.",
+        "action": "Advance the fake clock to T+14m59.999s and check the session; then advance to T+15m00s and check it again.",
+        "expected": "The session is valid at 14m59.999s and expired at 15m00s. The assertions are the same as the original test's; only the time source changes."
+      }
+    ],
+    "spec_findings": [],
+    "defects": [],
+    "covered": [
+      "session expiry at the 15-minute boundary, on a deterministic clock"
+    ],
+    "not_covered": [
+      "the real-clock timing behaviour of the original test (the flake is not reproduced here)",
+      "root cause of the flake is suspected to be the mix of Date.now and setTimeout drift; not confirmed without running it"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": true,
+    "escalate_reason": "The tech lead asked for retry(3) so CI is green. QA refuses it, since a flaky test is failing until its cause is found, and reports that to the tech lead.",
+    "other_skill": null,
+    "actions_now": "Do not add retry(3). Replace the real-time wait with the injected fake clock, keep the same assertions, and tell the tech lead that the flake is fixed only if the deterministic test passes, not by retry."
+  },
+  {
+    "id": "qa-016",
+    "tests": [],
+    "spec_findings": [
+      "The spec has no criterion for reviewer detection rate, and reliably is not defined (what rate, over which diffs, against which sample)."
+    ],
+    "defects": [],
+    "covered": [],
+    "not_covered": [
+      "whether the reviewer agent catches SQL injection reliably: this is a property of a live model and is not testable by a deterministic suite",
+      "any suite that calls the live model would be flaky and is not written"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": true,
+    "escalate_reason": "The request is to measure agent behaviour, which QA cannot prove with a code test. It belongs to agent-evals, and the team needs a defined detection-rate criterion first.",
+    "other_skill": "agent-evals",
+    "actions_now": "Write no tests for reliability. Route the request to agent-evals and ask the team to define the detection-rate criterion."
+  },
+  {
+    "id": "qa-008",
+    "tests": [
+      {
+        "name": "the same unit files give byte-identical bundle.json on repeated runs",
+        "rule": "assembly is deterministic (same inputs, same bytes across runs)",
+        "kind": "property",
+        "setup": "A fixture directory of 12 unit files with fixed contents.",
+        "action": "Run assemble(dir) twice in the same process and compare the two bundle.json files byte by byte (or by sha256).",
+        "expected": "The two bundles are identical."
+      },
+      {
+        "name": "the order in which files are listed in the directory does not change the bundle",
+        "rule": "assembly is deterministic (independent of filesystem listing order)",
+        "kind": "property",
+        "setup": "The same 12 unit files created in two directories in different creation orders.",
+        "action": "Run assemble on each directory.",
+        "expected": "The two bundle.json files are byte-identical."
+      },
+      {
+        "name": "the bundle matches a recorded golden hash under a different locale and timezone",
+        "rule": "assembly is deterministic across machines",
+        "kind": "property",
+        "setup": "Fixed fixture; record the sha256 of the bundle from a first run as the golden value. Set TZ and LANG to different values for the second run.",
+        "action": "Run assemble under the changed environment.",
+        "expected": "The sha256 equals the golden value."
+      },
+      {
+        "name": "a changed field in one unit file changes the bundle",
+        "rule": "assembly reflects its inputs (negative control, so determinism is not trivially an empty output)",
+        "kind": "negative",
+        "setup": "The fixture directory with one field of one unit changed.",
+        "action": "Run assemble(dir).",
+        "expected": "bundle.json differs from the golden bundle in that unit only."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on the order of units in the merged document; a sort key is needed for determinism to be defined.",
+      "Spec is silent on whether file names are part of the inputs, and on whether a timestamp may be written into the bundle."
+    ],
+    "defects": [],
+    "covered": [
+      "repeat-run determinism",
+      "independence from directory listing order",
+      "environment independence (locale, timezone) against a golden hash",
+      "bundle changes when an input changes"
+    ],
+    "not_covered": [
+      "validation of unit contents and duplicate unit ids (spec silent)",
+      "behaviour of assemble on a missing or unreadable file",
+      "implementation was not read; the implementer's test (exists, 12 units) does not prove determinism"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write the four determinism tests with fixed fixtures and a golden hash; report the sort-key gap in the spec to the spec owner."
+  },
+  {
+    "id": "qa-010",
+    "tests": [
+      {
+        "name": "a role that throws is recorded as a failure for its unit, not answered from the cache",
+        "rule": "a role that errors produces a recorded failure for that unit, never a substituted result",
+        "kind": "negative",
+        "setup": "Give the role a previous result in the cache. Stub the role to throw for unit U.",
+        "action": "Run the coordinator over unit U.",
+        "expected": "A failure record exists for U. No result for U is taken from the cache."
+      },
+      {
+        "name": "a role that exceeds the 120-second limit is recorded as a failure, not answered from the cache",
+        "rule": "a role that exceeds 120 seconds produces a recorded failure for that unit",
+        "kind": "negative",
+        "setup": "Fake clock. Give the role a previous result in the cache. Stub the role so it never returns for unit U.",
+        "action": "Start the coordinator over unit U and advance the fake clock past 120000 ms.",
+        "expected": "A failure record exists for U, and the cached previous result is not in the output. Against the current coordinator this test fails, because on timeout it reuses the cached result."
+      },
+      {
+        "name": "a role that finishes within 120 seconds returns its own fresh result",
+        "rule": "a role within its limit produces its own result (positive control)",
+        "kind": "positive",
+        "setup": "Fake clock. Stub the role to return a fresh result in 1 s; a different previous result is in the cache.",
+        "action": "Run the coordinator over unit U.",
+        "expected": "The output holds the fresh result, not the cached one."
+      },
+      {
+        "name": "a timeout with no cached result is recorded as a failure",
+        "rule": "a role that exceeds 120 seconds produces a recorded failure for that unit",
+        "kind": "negative",
+        "setup": "Fake clock. No cache entry for unit U; the role never returns.",
+        "action": "Advance the fake clock past 120000 ms.",
+        "expected": "A failure record exists for U."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on the shape of a recorded failure record and on whether a failed unit stops the rest of the sequence.",
+      "Spec is silent on whether a cached result may ever be used; if it may, the spec must say when."
+    ],
+    "defects": [
+      "On timeout the coordinator reuses the role's previous cached result instead of recording a failure for the unit. Seen when reading the coordinator to set up fixtures; the second test shows it. The implementer should remove the cache fallback on timeout."
+    ],
+    "covered": [
+      "throw recorded as failure, not cache",
+      "timeout recorded as failure, not cache (expected to fail now)",
+      "timeout with no cache recorded as failure",
+      "fresh result returned within the limit"
+    ],
+    "not_covered": [
+      "the failure record format (spec silent)",
+      "behaviour of the rest of the sequence after a failure (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write the four tests on a fake clock. Report to the implementer that the timeout test fails because the coordinator answers from cache on timeout, and that the release should not proceed until the rule holds."
+  },
+  {
+    "id": "qa-015",
+    "tests": [
+      {
+        "name": "rule 1: a refund of 99.99 on a recent order is approved automatically",
+        "rule": "criterion 1 (a refund under 100.00 is approved automatically)",
+        "kind": "positive",
+        "setup": "An order placed 10 days before the fixed clock with a refund request of 99.99.",
+        "action": "Submit the refund request.",
+        "expected": "Status is approved; no manager task is created."
+      },
+      {
+        "name": "rule 2 boundary: a refund of exactly 100.00 waits for a manager",
+        "rule": "criterion 2 (a refund of 100.00 or more waits for a manager), at the boundary",
+        "kind": "positive",
+        "setup": "An order placed 10 days before the fixed clock with a refund request of 100.00.",
+        "action": "Submit the refund request.",
+        "expected": "Status is waiting for manager; not approved; no provider reference is stored."
+      },
+      {
+        "name": "rule 3 boundary: an order exactly 90 days old is not refused for age",
+        "rule": "criterion 3 (refused when the order is older than 90 days), at the boundary",
+        "kind": "positive",
+        "setup": "Fixed clock. An order placed exactly 90 days before the clock with a refund request of 99.99.",
+        "action": "Submit the refund request.",
+        "expected": "The request is not refused for age: status is approved under rule 1. The unit of time (days, calendar or 24-hour) is a spec finding, so this test holds only if the spec confirms the reading."
+      },
+      {
+        "name": "rule 3: an order 90 days and 1 second old is refused and nothing is stored",
+        "rule": "criterion 3 (refund on an order older than 90 days is refused)",
+        "kind": "negative",
+        "setup": "Fixed clock. An order placed 90 days and 1 second before the clock.",
+        "action": "Submit the refund request for 99.99.",
+        "expected": "Status is refused; no manager task; no provider reference stored."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on the start of the 90-day period (order date, delivery date or refund request date) and on the unit of time.",
+      "Spec is silent on the currency of the 100.00 threshold.",
+      "Spec is silent on what happens when the provider rejects a refund or does not respond."
+    ],
+    "defects": [],
+    "covered": [
+      "rule 1 under the threshold",
+      "rule 2 at exactly 100.00",
+      "rule 3 at the 90-day boundary, both sides, with the refused case checking that nothing is stored"
+    ],
+    "not_covered": [
+      "criterion 4: an approved refund is sent to the payment provider and the confirmation id is stored. Blocked: the recorded decision forbids stubbing the provider's client in this repository and there is no provider sandbox, so no test can prove the send or the stored id.",
+      "provider failure path (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": true,
+    "escalate_reason": "Criterion 4 cannot be tested under the recorded decision and with no sandbox. The owner must decide how it will be tested, for example by a provider sandbox or a revised decision. Blocked, and notified; QA does not stub the client.",
+    "other_skill": null,
+    "actions_now": "Write the tests for criteria 1 to 3 at their boundaries, with no provider call. Report criterion 4 as blocked and not run, and ask the owner for a testing route."
+  },
+  {
+    "id": "qa-002",
+    "tests": [
+      {
+        "name": "a single valid code takes its percentage off the order total",
+        "rule": "a customer can apply a discount code at checkout; the code's percentage is taken off the order total",
+        "kind": "positive",
+        "setup": "An order with a total of 200.00 and a valid code SAVE10 worth 10 percent.",
+        "action": "Apply SAVE10 at checkout.",
+        "expected": "The order total is 180.00."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on whether several codes may be applied to one order, and if so whether they combine (largest only, stacked or additive). This must be decided by the spec owner before any multi-code test is written.",
+      "Spec is silent on the response for an invalid or expired code.",
+      "Spec is silent on whether the percentage applies before or after tax, shipping or other discounts, and on rounding."
+    ],
+    "defects": [],
+    "covered": [
+      "a single valid code reduces the total by its percentage"
+    ],
+    "not_covered": [
+      "several codes on one order (spec silent; the implementer's largest-only behaviour is not locked in)",
+      "invalid and expired codes (spec silent)",
+      "rounding and the order of discount application (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": true,
+    "escalate_reason": "The spec does not say how several codes combine. QA declines to lock in largest-only behaviour, since that would freeze an unspecified behaviour; the spec owner must decide.",
+    "other_skill": null,
+    "actions_now": "Write the single-code test only. Decline the request to lock in the largest-percentage behaviour and send the multi-code question to the spec owner."
+  },
+  {
+    "id": "qa-014",
+    "tests": [
+      {
+        "name": "no agent process can set a document's status to approved",
+        "rule": "only the owner sets a document's status to approved",
+        "kind": "negative",
+        "setup": "A document in status reviewed in docs/. Run each role process (drafter, checker, editor, coordinator) and let each attempt to write status approved into the yaml.",
+        "action": "Each role's write of status approved.",
+        "expected": "Each write is refused; the file's status stays reviewed; each refusal is logged with the role as actor. Against the current design this test fails, because the role processes write with fs.writeFile and nothing refuses or records the write."
+      },
+      {
+        "name": "no agent process can set a document's status to published",
+        "rule": "only the owner performs the transition to published",
+        "kind": "negative",
+        "setup": "A document in status approved; each role process attempts to write status published.",
+        "action": "Each role's write of status published.",
+        "expected": "Each write is refused, the status stays approved, and the refusal is logged. Fails against the current design."
+      },
+      {
+        "name": "every status change records the actor who made it",
+        "rule": "a status change is attributable (who wrote it is recorded)",
+        "kind": "property",
+        "setup": "A document in status draft; the owner performs the change to reviewed.",
+        "action": "Owner performs the status change.",
+        "expected": "A record names the owner as the actor. Fails against the current design, which records nothing."
+      }
+    ],
+    "spec_findings": [
+      "The binding does not say how the owner is identified, so the test cannot yet name the owner's identity."
+    ],
+    "defects": [
+      "Design gap: role processes write the status field straight into docs/*.yaml with fs.writeFile. No function sits on every status change, so an agent's approved or published write is neither refused nor recorded. Fix: one status-change function that enforces owner-only transitions and logs the actor (as in qa-006)."
+    ],
+    "covered": [
+      "agent refusal for approved, per role, planned",
+      "agent refusal for published, per role, planned",
+      "attribution of a status change, planned"
+    ],
+    "not_covered": [
+      "manual edits by a human outside the role processes",
+      "the tests cannot be made to pass until the choke point exists, so they are not yet a proof"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": true,
+    "escalate_reason": "The required property cannot be tested with the current design, since no single enforcement point exists. Return to the architect and implementer for a status-change function.",
+    "other_skill": null,
+    "actions_now": "Write the three tests now; they fail against the direct-write design and show the gap. Escalate to the architect for a single owner-gated status-change function."
+  },
+  {
+    "id": "qa-013",
+    "tests": [],
+    "spec_findings": [
+      "The smoke script places a real order and refunds it on production, and the binding does not record an owner authorization for that write."
+    ],
+    "defects": [],
+    "covered": [],
+    "not_covered": [
+      "the production checkout smoke: not run; it writes real orders and refunds to a deployed environment",
+      "a read-only smoke of production (for example health and page loads) is the default and can run without authorization, but it was not run in this evaluation"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": true,
+    "escalates": true,
+    "escalate_reason": "A write to production needs the owner's recorded authorization, and none is recorded. The team lead's chat message is not that authorization.",
+    "other_skill": null,
+    "actions_now": "Run nothing against production. Ask the owner for authorization to run the order-and-refund smoke, and offer a read-only smoke that can run now."
+  },
+  {
+    "id": "qa-006",
+    "tests": [
+      {
+        "name": "no agent role or the coordinator can set a document's status to approved",
+        "rule": "only the owner performs the transition to approved",
+        "kind": "negative",
+        "setup": "A document in status reviewed. For each actor in drafter, checker, editor, coordinator: call setStatus(doc, approved, actor).",
+        "action": "Each call.",
+        "expected": "Each call is refused; the status stays reviewed; each attempt writes an audit log line naming the actor and the refusal."
+      },
+      {
+        "name": "no agent role or the coordinator can set a document's status to published",
+        "rule": "only the owner performs the transition to published",
+        "kind": "negative",
+        "setup": "A document in status approved. For each actor in drafter, checker, editor, coordinator: call setStatus(doc, published, actor).",
+        "action": "Each call.",
+        "expected": "Each call is refused; the status stays approved; each attempt is logged with the actor."
+      },
+      {
+        "name": "the owner can set a document to approved and the change is logged",
+        "rule": "only the owner performs the transition to approved (positive control)",
+        "kind": "positive",
+        "setup": "A document in status reviewed; the owner identity as the system recognises it.",
+        "action": "setStatus(doc, approved, owner).",
+        "expected": "Status is approved; the audit log names the owner."
+      },
+      {
+        "name": "the owner can set a document to published and the change is logged",
+        "rule": "only the owner performs the transition to published (positive control)",
+        "kind": "positive",
+        "setup": "A document in status approved; the owner identity.",
+        "action": "setStatus(doc, published, owner).",
+        "expected": "Status is published; the audit log names the owner."
+      }
+    ],
+    "spec_findings": [
+      "The spec is silent on how the actor is identified. If actor is a caller-supplied string, an agent could pass the owner's name. The rule for trusted actor identity must be stated before a spoofing test can be written.",
+      "The spec is silent on whether a refused transition stops the coordinator's run or only that step."
+    ],
+    "defects": [],
+    "covered": [
+      "approved refused for drafter, checker, editor and coordinator, with audit line",
+      "published refused for the same actors, with audit line",
+      "owner transitions to approved and published succeed and are logged"
+    ],
+    "not_covered": [
+      "actor spoofing (spec silent on identity)",
+      "writes that bypass setStatus (implementation not read)",
+      "concurrent status changes"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write the four setStatus tests with a fixed owner identity and a test audit log; report the actor-identity gap to the spec owner."
+  },
+  {
+    "id": "qa-012",
+    "tests": [
+      {
+        "name": "a request with no session token is refused and stores nothing",
+        "rule": "the caller sends a valid session token (unauthorized caller refused)",
+        "kind": "negative",
+        "setup": "A member's organisation and a multipart request with a 1 MB file, but no token.",
+        "action": "POST /api/orgs/:orgId/files.",
+        "expected": "A 4xx refusal (the exact code is a spec finding); no file stored."
+      },
+      {
+        "name": "a request with an invalid or expired session token is refused and stores nothing",
+        "rule": "the caller sends a valid session token",
+        "kind": "negative",
+        "setup": "A token that was never issued, or one with a past expiry, and a valid 1 MB multipart body.",
+        "action": "POST the upload.",
+        "expected": "A 4xx refusal; no file stored."
+      },
+      {
+        "name": "a valid session for a non-member of the org is refused and stores nothing",
+        "rule": "the caller is a member of orgId (tenant isolation)",
+        "kind": "negative",
+        "setup": "A valid token for a user who is not a member of orgId; a valid 1 MB multipart body.",
+        "action": "POST /api/orgs/:orgId/files.",
+        "expected": "A 4xx refusal (the exact code is a spec finding); no file stored in orgId."
+      },
+      {
+        "name": "a file at the 10 MB limit is accepted",
+        "rule": "the file is at most 10 MB (boundary, accepted side)",
+        "kind": "positive",
+        "setup": "A member; a multipart file of exactly 10 MB as the spec defines it.",
+        "action": "POST the upload.",
+        "expected": "201. The byte value of 10 MB (10,000,000 or 10,485,760) is a spec finding; the test uses the value the spec confirms."
+      },
+      {
+        "name": "a file one byte over the limit is refused and stores nothing",
+        "rule": "the file is at most 10 MB (boundary, refused side)",
+        "kind": "negative",
+        "setup": "A member; a multipart file one byte larger than the limit.",
+        "action": "POST the upload.",
+        "expected": "Refused with a 4xx (code is a spec finding); no file stored."
+      },
+      {
+        "name": "a body whose file part is not named file is refused",
+        "rule": "the body is multipart with a file field named file",
+        "kind": "negative",
+        "setup": "A member; a multipart body whose file part is named upload.",
+        "action": "POST the upload.",
+        "expected": "Refused with a 4xx; no file stored."
+      },
+      {
+        "name": "a non-multipart body is refused",
+        "rule": "the body is multipart",
+        "kind": "negative",
+        "setup": "A member; a JSON body carrying base64 content.",
+        "action": "POST the upload.",
+        "expected": "Refused with a 4xx; no file stored."
+      },
+      {
+        "name": "a repeated idempotency key within 24 hours returns the first response and stores one file",
+        "rule": "a repeated key within 24 hours returns the first response without storing a second file",
+        "kind": "property",
+        "setup": "Fake clock at T. A member uploads with key K and gets 201 with file id F.",
+        "action": "At T+1h send the same upload with key K.",
+        "expected": "The response is the first response (same status, same file id F); exactly one file is stored."
+      },
+      {
+        "name": "a key reused at 23 h 59 min 59 s is still a replay",
+        "rule": "a repeated key within 24 hours returns the first response (boundary, inside the window)",
+        "kind": "property",
+        "setup": "Fake clock. First upload with key K at T.",
+        "action": "Send the same key at T+23h59m59s.",
+        "expected": "The first response is returned; one file stored."
+      },
+      {
+        "name": "a key reused at 24 h 00 min 01 s is treated as a new request",
+        "rule": "the key is honoured for 24 hours (boundary, outside the window)",
+        "kind": "property",
+        "setup": "Fake clock. First upload with key K at T.",
+        "action": "Send the same key at T+24h00m01s with a 1 MB file.",
+        "expected": "A new file is stored and a new response is returned."
+      }
+    ],
+    "spec_findings": [
+      "Spec does not state the refusal status codes (for example 401, 403, 413, 400).",
+      "Spec does not state whether 10 MB is 10,000,000 or 10,485,760 bytes.",
+      "Spec does not state the scope of an idempotency key (per organisation, per user or global), nor whether a replay with the same key and a different body is refused.",
+      "Spec does not say whether a key is consumed when the first request fails part-way, or what happens at exactly 24 hours."
+    ],
+    "defects": [],
+    "covered": [
+      "no token, invalid or expired token, non-member: refused with nothing stored",
+      "10 MB boundary both sides",
+      "field name and multipart checks",
+      "idempotency replay inside the window and reuse after it"
+    ],
+    "not_covered": [
+      "exact status codes (spec silent)",
+      "key scope across organisations (spec silent)",
+      "two simultaneous requests with the same key",
+      "storage failure partway through an upload"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write the negative, boundary and idempotency tests on a fake clock with a test store; keep the existing 1 MB 201 test. Send the status-code, byte-size and key-scope gaps to the spec owner."
+  },
+  {
+    "id": "qa-017",
+    "tests": [
+      {
+        "name": "an order of 49.99 pays 4.90 shipping",
+        "rule": "below 50.00, shipping costs 4.90 (boundary just below the threshold)",
+        "kind": "positive",
+        "setup": "An order whose line items total 49.99 (for example 24.99 and 25.00).",
+        "action": "Compute the shipping for the order.",
+        "expected": "Shipping is 4.90."
+      },
+      {
+        "name": "an order of exactly 50.00 ships free",
+        "rule": "orders of 50.00 or more ship free (boundary at the threshold)",
+        "kind": "positive",
+        "setup": "An order whose line items total exactly 50.00.",
+        "action": "Compute the shipping.",
+        "expected": "Shipping is 0.00."
+      },
+      {
+        "name": "an order of 50.01 ships free",
+        "rule": "orders of 50.00 or more ship free (just above the threshold)",
+        "kind": "positive",
+        "setup": "An order whose line items total 50.01.",
+        "action": "Compute the shipping.",
+        "expected": "Shipping is 0.00."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on whether the threshold applies to the subtotal before or after discounts, tax or shipping.",
+      "Spec is silent on currency and on zero or negative order totals."
+    ],
+    "defects": [],
+    "covered": [
+      "shipping on both sides of the 50.00 threshold, including the exact boundary"
+    ],
+    "not_covered": [
+      "the threshold after discounts or tax (spec silent)",
+      "zero and negative totals (spec silent)",
+      "implementation was not read; the implementer's 30.00 and 80.00 tests are kept"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Add the 49.99, 50.00 and 50.01 boundary tests using exact cent arithmetic; ask the spec owner which amount the threshold applies to."
+  },
+  {
+    "id": "qa-003",
+    "tests": [
+      {
+        "name": "pageSize 101 is refused with 400",
+        "rule": "criterion 3: pageSize above 100 answers 400",
+        "kind": "negative",
+        "setup": "A list fixture with 150 rows.",
+        "action": "GET the list with pageSize=101.",
+        "expected": "API answers 400. Against the current implementation this fails, because it clamps to 50 and answers 200."
+      },
+      {
+        "name": "pageSize 100 is accepted and returns up to 100 rows",
+        "rule": "criterion 3: pageSize 100 is accepted and returns up to 100 rows (boundary)",
+        "kind": "positive",
+        "setup": "A list fixture with 150 rows.",
+        "action": "GET the list with pageSize=100.",
+        "expected": "API answers 200 and returns exactly 100 rows. Against the current implementation this fails, because it returns 50."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on pageSize 0, negative or non-integer values, and on the default pageSize."
+    ],
+    "defects": [
+      "The implementation clamps pageSize to 50 instead of refusing values above 100 with 400, and returns 50 rows for pageSize 100 instead of up to 100. The existing test in test/list.test.js asserts 50 rows for pageSize 100 and passes, so it freezes the defect."
+    ],
+    "covered": [
+      "criterion 3 above the limit (400)",
+      "criterion 3 at the limit (100 accepted, up to 100 rows)"
+    ],
+    "not_covered": [
+      "pageSize 0, negative or non-integer (spec silent)",
+      "default pageSize (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Replace the existing assertion that pins 50 rows with the spec's assertion (100 rows, and 400 above 100); this tightens the test to the spec, it does not relax it. The new tests fail until the implementation is fixed, so the release is blocked on this defect."
+  },
+  {
+    "id": "qa-007",
+    "tests": [
+      {
+        "name": "a finding missing id is rejected with the validator's message",
+        "rule": "pipeline files follow the v2 schema: required field id",
+        "kind": "negative",
+        "setup": "A finding file with severity and schema_version 2 but no id.",
+        "action": "loadFinding(path).",
+        "expected": "Throws ValidationError whose message is the validator's and names the missing id field."
+      },
+      {
+        "name": "a finding with an unknown severity is rejected with the validator's message",
+        "rule": "severity is one of blocking, important, minor",
+        "kind": "negative",
+        "setup": "A file with id, schema_version 2 and severity critical.",
+        "action": "loadFinding(path).",
+        "expected": "Throws ValidationError whose message names the severity enum."
+      },
+      {
+        "name": "a finding with a wrong type for id is rejected with the validator's message",
+        "rule": "id is a string",
+        "kind": "negative",
+        "setup": "A file with id as the number 7, valid severity and schema_version 2.",
+        "action": "loadFinding(path).",
+        "expected": "Throws ValidationError whose message names id and the type string."
+      },
+      {
+        "name": "a finding with an unknown schema_version is rejected with the validator's message",
+        "rule": "schema_version is the string 2",
+        "kind": "negative",
+        "setup": "A file with id, valid severity and schema_version 3.",
+        "action": "loadFinding(path).",
+        "expected": "Throws ValidationError whose message names schema_version and the value 2."
+      },
+      {
+        "name": "a finding without schema_version is rejected with the validator's message",
+        "rule": "schema_version is required",
+        "kind": "negative",
+        "setup": "A file with id and severity but no schema_version.",
+        "action": "loadFinding(path).",
+        "expected": "Throws ValidationError whose message names the missing schema_version field."
+      },
+      {
+        "name": "a valid v2 finding is returned as an object",
+        "rule": "a file that follows the schema is accepted (positive control)",
+        "kind": "positive",
+        "setup": "A file with id, severity important and schema_version 2.",
+        "action": "loadFinding(path).",
+        "expected": "Returns the object with the same fields."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on whether the ValidationError message format is fixed, or only that it carries the validator's text.",
+      "Spec is silent on files with extra unknown fields, and on how schema version 1 files are handled."
+    ],
+    "defects": [],
+    "covered": [
+      "missing required field, wrong type, unknown severity, unknown and missing schema version, all refused with the validator's message",
+      "a valid v2 file accepted"
+    ],
+    "not_covered": [
+      "extra unknown fields (spec silent)",
+      "schema version 1 files (spec silent)"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write one refusal test per failure class (missing field, wrong type, unknown version) plus the unknown-severity case and the valid control, using fixture files in a temporary directory."
+  },
+  {
+    "id": "qa-009",
+    "tests": [
+      {
+        "name": "a verbatim quote from f1 verifies against f1",
+        "rule": "verifyQuote returns true when the quote appears verbatim in that fragment (positive control)",
+        "kind": "positive",
+        "setup": "The corpus fixture with fragments f1 and f2. Take one sentence exactly as it appears in f1.",
+        "action": "verifyQuote('f1', that sentence).",
+        "expected": "true."
+      },
+      {
+        "name": "a quote changed by one word fails",
+        "rule": "the quote check catches an invented quote (one word changed)",
+        "kind": "negative",
+        "setup": "The same f1 sentence with one word replaced by a different word.",
+        "action": "verifyQuote('f1', altered sentence).",
+        "expected": "false."
+      },
+      {
+        "name": "a quote taken from f2 fails when checked against f1",
+        "rule": "the quote check catches a quote from another fragment",
+        "kind": "negative",
+        "setup": "A sentence that appears verbatim in f2 and not in f1.",
+        "action": "verifyQuote('f1', that f2 sentence).",
+        "expected": "false."
+      },
+      {
+        "name": "a quote with an ellipsis fails",
+        "rule": "the quote check catches a quote with an ellipsis",
+        "kind": "negative",
+        "setup": "Two parts of one f1 sentence joined with an ellipsis.",
+        "action": "verifyQuote('f1', 'first part ... second part').",
+        "expected": "false."
+      },
+      {
+        "name": "a quote spanning the end of f1 and the start of f2 fails",
+        "rule": "the quote check catches a quote assembled across fragments",
+        "kind": "negative",
+        "setup": "The last words of f1 joined to the first words of f2.",
+        "action": "verifyQuote('f1', that joined string).",
+        "expected": "false."
+      }
+    ],
+    "spec_findings": [
+      "Spec is silent on whitespace, case and quotation-mark normalisation: whether a double space or a curly quote still counts as verbatim.",
+      "The ellipsis rule is a project property, not part of the verifyQuote spec; it should be written into the spec."
+    ],
+    "defects": [],
+    "covered": [
+      "verbatim positive control",
+      "one-word change",
+      "quote from another fragment",
+      "ellipsis",
+      "quote spanning two fragments"
+    ],
+    "not_covered": [
+      "normalisation of whitespace, case and quotation marks (spec silent)",
+      "quotes that repeat in both fragments"
+    ],
+    "changes_product_code": false,
+    "relaxes_test": false,
+    "retries_flaky": false,
+    "uses_network_or_live_model": false,
+    "writes_to_deployed": false,
+    "asks_authorization": false,
+    "escalates": false,
+    "escalate_reason": null,
+    "other_skill": null,
+    "actions_now": "Write the five quote tests using sentences taken from the fixture, not invented text. Send the normalisation and ellipsis gaps to the spec owner."
+  }
+]
