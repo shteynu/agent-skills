@@ -1,0 +1,67 @@
+{
+ "rubric": "tests-from-spec",
+ "case": "qa-001",
+ "grader": "claude-sonnet-5-5",
+ "grades": [
+  {
+   "answer": "A1",
+   "score": 3,
+   "reason": "Every criterion has a rule-named test with a fixed clock, including the exact 30:00 boundary and 29:59.999 on the other side.",
+   "run": "opus-run-3"
+  },
+  {
+   "answer": "A2",
+   "score": 3,
+   "reason": "Tests for 29:59, exactly 30:00 and 30:01 plus reuse and unknown token, all named after their rules and asserting 410/404 and unchanged password.",
+   "run": "haiku-run-2"
+  },
+  {
+   "answer": "A3",
+   "score": 3,
+   "reason": "Covers 29:59, exactly 30:00, 2h, reuse and unissued token with fixed clock; each would fail if its rule broke.",
+   "run": "opus-run-5"
+  },
+  {
+   "answer": "A4",
+   "score": 3,
+   "reason": "Boundary pair at 29:59 and 30:00 with hash-identical check, plus 31 min, reuse and unknown token; names follow the rules.",
+   "run": "haiku-run-4"
+  },
+  {
+   "answer": "A5",
+   "score": 3,
+   "reason": "All four criteria tested with rule-named tests and the exact 30-minute boundary; the reuse test asserts only 410, which still fails if the rule is broken.",
+   "run": "haiku-run-1"
+  },
+  {
+   "answer": "A6",
+   "score": 3,
+   "reason": "All criteria and both sides of the 30-minute boundary are covered; the extra cross-user test is speculative but does not weaken any criterion test.",
+   "run": "opus-run-1"
+  },
+  {
+   "answer": "A7",
+   "score": 3,
+   "reason": "Boundary at 29:59 and exactly 30 min, 31 min, reuse and unissued token, each named after its rule with an injected clock.",
+   "run": "haiku-run-5"
+  },
+  {
+   "answer": "A8",
+   "score": 3,
+   "reason": "Every criterion tested, including exactly 30:00 with 410 and password unchanged; the extra altered-token test is within criterion 4.",
+   "run": "opus-run-4"
+  },
+  {
+   "answer": "A9",
+   "score": 3,
+   "reason": "Covers 29m59s, exactly 30m, 2h, reuse and unissued tokens with a fixed clock; the concurrency test is an extra that still maps to criterion 3.",
+   "run": "opus-run-2"
+  },
+  {
+   "answer": "A10",
+   "score": 3,
+   "reason": "Rule-named tests for 29:59, exactly 30 min, 31 min, reuse and unissued token, all with a fake clock and correct expected codes.",
+   "run": "haiku-run-3"
+  }
+ ]
+}

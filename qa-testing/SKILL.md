@@ -16,6 +16,8 @@ system under test is an agent pipeline or its coordinator;
 `Negative tests` and `Determinism` — writing or reviewing any suite;
 `End-to-end smoke` — a user-visible or cross-service flow changed. Evaluating
 agent behavior rather than code is [agent-evals](../agent-evals/SKILL.md).
+The evaluation set is in [references/eval-set.md](references/eval-set.md),
+opened when this skill changes or a suite in use passed a defect.
 
 ## Tests from the spec
 
